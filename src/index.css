@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* SIMEL ITPLN Design System - Energy Management Dashboard */
+    
+    /* Brand Colors - ITPLN */
+    --primary: 200 100% 26.5%; /* #005A87 - Primary Blue ITPLN */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 195 100% 46.9%; /* #00AEEF - Secondary Teal ITPLN */
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Status Colors */
+    --success: 122 39% 49%; /* #4CAF50 - Success/Normal */
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 45 100% 51%; /* #FFC107 - Warning */
+    --warning-foreground: 0 0% 0%;
+    
+    --alert: 4 90% 58%; /* #E53935 - Alert/Error */
+    --alert-foreground: 0 0% 100%;
+    
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Surface Colors */
+    --background: 150 20% 96%; /* #F4F7F6 - Light background */
+    --foreground: 210 11% 15%; /* #212529 - Primary text */
+    
+    --card: 0 0% 100%; /* #FFFFFF - Card surface */
+    --card-foreground: 210 11% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 11% 15%;
+    
+    /* Interactive Elements */
+    --muted: 210 14% 89%;
+    --muted-foreground: 210 9% 46%; /* #6C757D - Secondary text */
+    
+    --accent: 195 100% 46.9%;
+    --accent-foreground: 0 0% 100%;
+    
+    --border: 210 14% 89%;
+    --input: 210 14% 89%;
+    --ring: 200 100% 26.5%;
+    
+    --radius: 0.75rem;
+    
+    /* Chart Colors */
+    --chart-1: 200 100% 26.5%; /* Primary Blue */
+    --chart-2: 195 100% 46.9%; /* Secondary Teal */
+    --chart-3: 122 39% 49%; /* Success Green */
+    --chart-4: 45 100% 51%; /* Warning Yellow */
+    --chart-5: 4 90% 58%; /* Alert Red */
+    
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 210 11% 15%;
+    --sidebar-primary: 200 100% 26.5%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 20% 96%;
+    --sidebar-accent-foreground: 210 11% 15%;
+    --sidebar-border: 210 14% 89%;
+    --sidebar-ring: 200 100% 26.5%;
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(200 100% 26.5% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(200 100% 26.5% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(200 100% 26.5% / 0.1);
+    --shadow-glow: 0 0 20px hsl(195 100% 46.9% / 0.3);
+  }
+
+  .dark {
+    --background: 210 11% 8%;
+    --foreground: 0 0% 98%;
+    
+    --card: 210 11% 12%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 210 11% 12%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 195 100% 46.9%;
+    --primary-foreground: 0 0% 0%;
+    
+    --secondary: 200 100% 26.5%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 210 11% 20%;
+    --muted-foreground: 210 9% 65%;
+    
+    --accent: 195 100% 46.9%;
+    --accent-foreground: 0 0% 0%;
+    
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 210 11% 20%;
+    --input: 210 11% 20%;
+    --ring: 195 100% 46.9%;
+    
+    --sidebar-background: 210 11% 8%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 195 100% 46.9%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 210 11% 20%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 210 11% 20%;
+    --sidebar-ring: 195 100% 46.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+}

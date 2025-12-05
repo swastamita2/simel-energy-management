@@ -1,0 +1,26 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="24" cy="24" r="22" fill="url(#bgGradient)"/>
+  
+  <!-- Lightning Bolt -->
+  <path d="M28 12L18 24H24L18 36L28 24H22L28 12Z" fill="white" stroke="white" stroke-width="1" stroke-linejoin="round"/>
+  
+  <!-- Circuit Pattern -->
+  <circle cx="12" cy="12" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="36" cy="12" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="12" cy="36" r="1.5" fill="white" opacity="0.4"/>
+  <circle cx="36" cy="36" r="1.5" fill="white" opacity="0.4"/>
+  
+  <line x1="12" y1="12" x2="18" y2="18" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="36" y1="12" x2="30" y2="18" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="12" y1="36" x2="18" y2="30" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <line x1="36" y1="36" x2="30" y2="30" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005A87"/>
+      <stop offset="100%" stop-color="#00AEEF"/>
+    </linearGradient>
+  </defs>
+</svg>

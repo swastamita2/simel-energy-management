@@ -1,0 +1,27 @@
+<svg width="180" height="80" viewBox="0 0 180 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shield Background -->
+  <path d="M40 10 L60 10 L65 20 L60 70 L40 70 L35 20 Z" fill="url(#shieldGradient)" opacity="0.1"/>
+  <path d="M40 10 L60 10 L65 20 L60 70 L40 70 L35 20 Z" stroke="url(#shieldGradient)" stroke-width="2" fill="none"/>
+  
+  <!-- Lightning Bolt -->
+  <path d="M55 25L45 40H50L45 55L55 40H50L55 25Z" fill="#00AEEF" stroke="#005A87" stroke-width="1.5" stroke-linejoin="round"/>
+  
+  <!-- Energy Pulse Lines -->
+  <path d="M38 45 Q40 42 42 45" stroke="#4CAF50" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M58 45 Q56 42 54 45" stroke="#4CAF50" stroke-width="1.5" fill="none" opacity="0.6"/>
+  
+  <!-- SIMEL Text -->
+  <text x="75" y="35" font-family="Inter, sans-serif" font-weight="700" font-size="28" fill="#005A87">SIMEL</text>
+  
+  <!-- Subtitle -->
+  <text x="75" y="52" font-family="Inter, sans-serif" font-weight="500" font-size="12" fill="#00AEEF">Energy Monitor</text>
+  <text x="75" y="65" font-family="Inter, sans-serif" font-weight="400" font-size="10" fill="#6C757D">Institut Teknologi PLN</text>
+  
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005A87"/>
+      <stop offset="100%" stop-color="#00AEEF"/>
+    </linearGradient>
+  </defs>
+</svg>
