@@ -110,7 +110,7 @@ export const Sidebar = () => {
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 border-b border-border px-6">
         <img 
-          src="/src/assets/logo-hex.svg" 
+          src="/logo-hex.svg" 
           alt="SIMEL Logo" 
           className="h-10 w-10"
         />

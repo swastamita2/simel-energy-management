@@ -52,7 +52,7 @@ const Login: React.FC = () => {
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
             <img 
-              src="/src/assets/logo-tech.svg" 
+              src="/logo-tech.svg" 
               alt="SIMEL ITPLN" 
               className="h-14 w-auto"
             />
