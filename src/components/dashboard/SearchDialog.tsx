@@ -80,8 +80,8 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     if (stored) {
       try {
         setRecentSearches(JSON.parse(stored));
-      } catch (e) {
-        console.error('Failed to parse recent searches:', e);
+      } catch {
+        // Failed to parse, ignore
       }
     }
   }, []);

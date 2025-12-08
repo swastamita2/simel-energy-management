@@ -102,8 +102,8 @@ const Settings = () => {
         if (loaded.darkMode !== (theme === 'dark')) {
           setTheme(loaded.darkMode ? 'dark' : 'light');
         }
-      } catch (error) {
-        console.error("Failed to load settings:", error);
+      } catch {
+        // Failed to parse, use defaults
       }
     } else {
       // If no saved settings, sync with current theme

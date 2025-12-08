@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, LoginCredentials } from '@/types';
 import { authService } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
@@ -33,8 +33,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(storedUser);
           }
         }
-      } catch (error) {
-        console.error('Failed to initialize auth:', error);
       } finally {
         setIsLoading(false);
       }
@@ -76,7 +74,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: 'Anda telah keluar dari sistem',
       });
     } catch (error) {
-      console.error('Logout error:', error);
       toast({
         variant: 'destructive',
         title: 'Logout Gagal',
