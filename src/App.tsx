@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { EnergyProvider } from "@/contexts/EnergyContext";
 import { useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import Index from "./pages/Index";
@@ -38,10 +39,11 @@ const App = () => (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
+          <EnergyProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             
@@ -122,6 +124,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+          </EnergyProvider>
       </TooltipProvider>
     </QueryClientProvider>
     </ThemeProvider>

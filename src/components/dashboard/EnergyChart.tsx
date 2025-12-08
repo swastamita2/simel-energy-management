@@ -13,9 +13,9 @@ interface EnergyChartProps {
 
 export const EnergyChart = ({ title, data, type = "area" }: EnergyChartProps) => {
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-bold text-foreground mb-4">{title}</h3>
-      <div className="h-[300px] w-full">
+    <Card className="p-4 md:p-6 hover:shadow-lg transition-shadow">
+      <h3 className="text-base md:text-lg font-bold text-foreground mb-4">{title}</h3>
+      <div className="h-[250px] md:h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           {type === "area" ? (
             <AreaChart data={data}>
@@ -33,21 +33,25 @@ export const EnergyChart = ({ title, data, type = "area" }: EnergyChartProps) =>
               <XAxis 
                 dataKey="time" 
                 stroke="hsl(var(--muted-foreground))"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '11px' }}
+                tick={{ fontSize: 11 }}
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '11px' }}
+                tick={{ fontSize: 11 }}
+                width={40}
               />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  fontSize: '12px'
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Area
                 type="monotone"
                 dataKey="consumption"
@@ -73,26 +77,32 @@ export const EnergyChart = ({ title, data, type = "area" }: EnergyChartProps) =>
               <XAxis 
                 dataKey="time" 
                 stroke="hsl(var(--muted-foreground))"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '11px' }}
+                tick={{ fontSize: 11 }}
               />
               <YAxis 
                 stroke="hsl(var(--muted-foreground))"
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: '11px' }}
+                tick={{ fontSize: 11 }}
+                width={40}
               />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  fontSize: '12px'
                 }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Line
                 type="monotone"
                 dataKey="consumption"
                 stroke="hsl(var(--primary))"
                 strokeWidth={2}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5 }}
                 name="Consumption (kW)"
               />
               {data[0]?.efficiency !== undefined && (
@@ -101,6 +111,8 @@ export const EnergyChart = ({ title, data, type = "area" }: EnergyChartProps) =>
                   dataKey="efficiency"
                   stroke="hsl(var(--secondary))"
                   strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 5 }}
                   name="Efficiency (%)"
                 />
               )}

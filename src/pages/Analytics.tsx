@@ -10,36 +10,10 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
-
-const monthlyData = [
-  { time: "Jan", consumption: 28400, efficiency: 85 },
-  { time: "Feb", consumption: 29200, efficiency: 86 },
-  { time: "Mar", consumption: 26500, efficiency: 88 },
-  { time: "Apr", consumption: 28900, efficiency: 87 },
-  { time: "May", consumption: 31200, efficiency: 84 },
-  { time: "Jun", consumption: 30800, efficiency: 85 },
-  { time: "Jul", consumption: 29600, efficiency: 86 },
-  { time: "Aug", consumption: 28200, efficiency: 87 },
-  { time: "Sep", consumption: 27800, efficiency: 89 },
-  { time: "Oct", consumption: 29100, efficiency: 88 },
-];
-
-const hourlyData = [
-  { time: "00:00", consumption: 245 },
-  { time: "02:00", consumption: 210 },
-  { time: "04:00", consumption: 189 },
-  { time: "06:00", consumption: 268 },
-  { time: "08:00", consumption: 312 },
-  { time: "10:00", consumption: 385 },
-  { time: "12:00", consumption: 398 },
-  { time: "14:00", consumption: 412 },
-  { time: "16:00", consumption: 425 },
-  { time: "18:00", consumption: 389 },
-  { time: "20:00", consumption: 367 },
-  { time: "22:00", consumption: 298 },
-];
+import { useEnergy } from "@/contexts/EnergyContext";
 
 const Analytics = () => {
+  const { stats, realtimeData, weeklyData } = useEnergy();
   const [date, setDate] = useState<Date>();
 
   const handleExportReport = () => {
@@ -48,20 +22,23 @@ const Analytics = () => {
       ['Energy Analytics Report'],
       [`Generated: ${new Date().toLocaleString()}`],
       [''],
-      ['Monthly Data'],
-      ['Month', 'Consumption (kWh)', 'Efficiency (%)'],
-      ...monthlyData.map(d => [d.time, d.consumption, d.efficiency]),
+      ['Weekly Data'],
+      ['Day', 'Consumption (kWh)', 'Efficiency (%)'],
+      ...weeklyData.map(d => [d.time, d.consumption, d.efficiency]),
+      [''],
+      ['Real-time Data'],
+      ['Time', 'Consumption (kWh)', 'Efficiency (%)'],
+      ...realtimeData.map(d => [d.time, d.consumption, d.efficiency]),
       [''],
       ['Key Insights'],
-      ['Metric', 'Value', 'Trend', 'Description'],
-      ...insights.map(i => [i.title, i.value, `${i.trend.value}%`, i.description]),
+      ['Metric', 'Value'],
+      ...insights.map(i => [i.title, i.value]),
       [''],
-      ['Building Comparison'],
-      ['Building', 'Consumption (kWh)', 'Efficiency (%)'],
-      ['Gedung A', '8200', '92'],
-      ['Gedung B', '9800', '88'],
-      ['Gedung C', '12400', '85'],
-      ['Gedung D', '7600', '90'],
+      ['Current Statistics'],
+      ['Total Consumption', `${stats.totalConsumption} kWh`],
+      ['System Efficiency', `${stats.efficiency}%`],
+      ['Active Devices', `${stats.activeDevices}/${stats.totalDevices}`],
+      ['Cost Savings', `Rp ${stats.costSavings}M`],
     ].map(row => row.join(',')).join('\n');
 
     // Create blob and download
@@ -80,28 +57,28 @@ const Analytics = () => {
 
   const insights = [
     {
-      title: "Peak Usage Time",
-      value: "14:00 - 16:00",
+      title: "Total Consumption",
+      value: `${stats.totalConsumption.toFixed(1)} kWh`,
       trend: { value: 15, isPositive: false },
-      description: "Highest consumption period"
+      description: "Current consumption"
     },
     {
-      title: "Most Efficient Building",
-      value: "Gedung A",
+      title: "System Efficiency",
+      value: `${stats.efficiency}%`,
       trend: { value: 8, isPositive: true },
-      description: "92% efficiency score"
+      description: "Overall efficiency"
     },
     {
-      title: "Cost per kWh",
-      value: "Rp 1,467",
+      title: "Cost Savings",
+      value: `Rp ${stats.costSavings}M`,
       trend: { value: 3, isPositive: true },
-      description: "Below average tariff"
+      description: "Today's savings"
     },
     {
-      title: "Carbon Footprint",
-      value: "3,240 kg",
+      title: "Carbon Reduction",
+      value: `${stats.carbonReduction} kg`,
       trend: { value: 12, isPositive: true },
-      description: "Monthly CO₂ reduction"
+      description: "CO₂ reduced today"
     },
   ];
 
@@ -173,13 +150,13 @@ const Analytics = () => {
           {/* Charts */}
           <div className="grid gap-6 mb-6">
             <EnergyChart
-              title="Monthly Consumption & Efficiency Trends"
-              data={monthlyData}
+              title="Weekly Consumption Trends"
+              data={weeklyData}
               type="area"
             />
             <EnergyChart
-              title="Hourly Consumption Pattern (Today)"
-              data={hourlyData}
+              title="Real-time Consumption & Efficiency"
+              data={realtimeData}
               type="line"
             />
           </div>

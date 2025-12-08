@@ -6,7 +6,7 @@ import { GaugeChart } from "@/components/monitoring/GaugeChart";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Filter, Download, RefreshCw } from "lucide-react";
+import { Search, Download, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -17,174 +17,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface Room {
-  id: number;
-  name: string;
-  building: string;
-  consumption: number;
-  temperature: number;
-  devicesOn: number;
-  totalDevices: number;
-  status: "normal" | "warning" | "alert";
-  enabled: boolean;
-}
-
-interface Device {
-  id: number;
-  name: string;
-  type: "light" | "ac" | "projector" | "other";
-  room: string;
-  status: "on" | "off" | "offline";
-  power: number;
-}
-
-const initialRooms: Room[] = [
-  { id: 1, name: "Lab Komputer 1", building: "Gedung A - Lt. 2", consumption: 4.2, temperature: 24, devicesOn: 18, totalDevices: 20, status: "normal", enabled: true },
-  { id: 2, name: "Ruang Kuliah 201", building: "Gedung A - Lt. 2", consumption: 3.8, temperature: 26, devicesOn: 12, totalDevices: 15, status: "normal", enabled: true },
-  { id: 3, name: "Lab Elektronika", building: "Gedung B - Lt. 1", consumption: 8.5, temperature: 28, devicesOn: 24, totalDevices: 25, status: "warning", enabled: true },
-  { id: 4, name: "Auditorium", building: "Gedung C", consumption: 12.4, temperature: 23, devicesOn: 32, totalDevices: 35, status: "alert", enabled: true },
-  { id: 5, name: "Perpustakaan", building: "Gedung D - Lt. 1", consumption: 5.6, temperature: 25, devicesOn: 28, totalDevices: 30, status: "normal", enabled: true },
-  { id: 6, name: "Kantor Dosen", building: "Gedung A - Lt. 3", consumption: 2.1, temperature: 26, devicesOn: 8, totalDevices: 12, status: "normal", enabled: true },
-];
-
-const initialDevices: Device[] = [
-  { id: 1, name: "LED Panel 1", type: "light", room: "Lab Komputer 1", status: "on", power: 120 },
-  { id: 2, name: "AC Unit 1", type: "ac", room: "Lab Komputer 1", status: "on", power: 850 },
-  { id: 3, name: "Projector", type: "projector", room: "Ruang Kuliah 201", status: "on", power: 280 },
-  { id: 4, name: "LED Panel 2", type: "light", room: "Ruang Kuliah 201", status: "off", power: 0 },
-  { id: 5, name: "AC Unit 2", type: "ac", room: "Lab Elektronika", status: "on", power: 920 },
-  { id: 6, name: "Exhaust Fan", type: "other", room: "Lab Elektronika", status: "offline", power: 0 },
-  { id: 7, name: "LED Panel 3", type: "light", room: "Auditorium", status: "on", power: 200 },
-  { id: 8, name: "Sound System", type: "other", room: "Auditorium", status: "on", power: 450 },
-];
+import { useEnergy } from "@/contexts/EnergyContext";
 
 const Monitoring = () => {
-  const [rooms, setRooms] = useState<Room[]>(initialRooms);
-  const [devices, setDevices] = useState<Device[]>(initialDevices);
+  const {
+    devices,
+    rooms,
+    stats,
+    updateDeviceStatus,
+    updateDevicePower,
+    toggleRoom,
+    refreshData,
+    isRefreshing
+  } = useEnergy();
+
   const [roomSearchQuery, setRoomSearchQuery] = useState("");
   const [deviceSearchQuery, setDeviceSearchQuery] = useState("");
   const [buildingFilter, setBuildingFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Calculate total consumption
-  const totalConsumption = rooms.reduce((sum, room) => sum + (room.enabled ? room.consumption : 0), 0);
-  const peakLoad = Math.max(...rooms.map(r => r.consumption));
-  const activeDevices = devices.filter(d => d.status === "on").length;
-  const efficiency = Math.round((activeDevices / devices.length) * 100);
 
   // Handle room master control
   const handleRoomToggle = (roomId: number, enabled: boolean) => {
-    setRooms(prevRooms =>
-      prevRooms.map(room =>
-        room.id === roomId
-          ? {
-              ...room,
-              enabled,
-              devicesOn: enabled ? room.totalDevices : 0,
-              consumption: enabled ? room.consumption : 0
-            }
-          : room
-      )
-    );
-
+    toggleRoom(roomId);
     const room = rooms.find(r => r.id === roomId);
-    toast.success(`${room?.name} ${enabled ? 'enabled' : 'disabled'}`, {
-      description: enabled ? 'All devices turned on' : 'All devices turned off'
+    toast.success(`${room?.name} ${enabled ? 'disabled' : 'enabled'}`, {
+      description: enabled ? 'All devices turned off' : 'All devices turned on'
     });
-
-    // Update devices in this room
-    if (room) {
-      setDevices(prevDevices =>
-        prevDevices.map(device =>
-          device.room === room.name
-            ? { ...device, status: enabled ? "on" : "off", power: enabled ? (device.type === 'ac' ? 850 : device.type === 'light' ? 120 : 280) : 0 }
-            : device
-        )
-      );
-    }
   };
 
   // Handle device toggle
   const handleDeviceToggle = (deviceId: number, enabled: boolean) => {
-    setDevices(prevDevices =>
-      prevDevices.map(device =>
-        device.id === deviceId
-          ? {
-              ...device,
-              status: device.status === "offline" ? "offline" : (enabled ? "on" : "off"),
-              power: enabled ? (device.type === 'ac' ? 850 : device.type === 'light' ? 120 : 280) : 0
-            }
-          : device
-      )
-    );
-
     const device = devices.find(d => d.id === deviceId);
     if (device?.status !== "offline") {
+      updateDeviceStatus(deviceId, enabled ? "on" : "off");
       toast.success(`${device?.name} turned ${enabled ? 'on' : 'off'}`);
-      
-      // Update room consumption
-      const roomName = device?.room;
-      if (roomName) {
-        setRooms(prevRooms =>
-          prevRooms.map(room => {
-            if (room.name === roomName) {
-              const roomDevices = devices.filter(d => d.room === roomName);
-              const devicesOn = roomDevices.filter(d => d.status === "on" || (d.id === deviceId && enabled)).length;
-              const consumption = roomDevices.reduce((sum, d) => 
-                sum + (d.status === "on" || (d.id === deviceId && enabled) ? (d.power / 1000) : 0), 0
-              );
-              return { ...room, devicesOn, consumption: Number(consumption.toFixed(1)) };
-            }
-            return room;
-          })
-        );
-      }
     }
   };
 
   // Handle device power change
   const handleDevicePowerChange = (deviceId: number, power: number) => {
-    setDevices(prevDevices =>
-      prevDevices.map(device =>
-        device.id === deviceId ? { ...device, power } : device
-      )
-    );
-
-    // Update room consumption
-    const device = devices.find(d => d.id === deviceId);
-    if (device) {
-      setRooms(prevRooms =>
-        prevRooms.map(room => {
-          if (room.name === device.room) {
-            const roomDevices = devices.filter(d => d.room === device.room);
-            const consumption = roomDevices.reduce((sum, d) => 
-              sum + (d.id === deviceId ? power : d.power) / 1000, 0
-            );
-            return { ...room, consumption: Number(consumption.toFixed(1)) };
-          }
-          return room;
-        })
-      );
-    }
-  };
-
-  // Handle refresh
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    toast.info("Refreshing data...");
-    setTimeout(() => {
-      setIsRefreshing(false);
-      toast.success("Data refreshed successfully");
-    }, 1000);
+    updateDevicePower(deviceId, power);
   };
 
   // Handle export
   const handleExport = () => {
     const csvContent = [
-      ["Room", "Building", "Consumption (kW)", "Temperature (°C)", "Devices On", "Total Devices", "Status"],
-      ...rooms.map(r => [r.name, r.building, r.consumption, r.temperature, r.devicesOn, r.totalDevices, r.status])
+      ["Room", "Building", "Consumption (kW)", "Devices On", "Total Devices", "Status"],
+      ...rooms.map(r => [r.name, r.building, r.consumption, r.devicesOn, r.totalDevices, r.status])
     ].map(row => row.join(",")).join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv" });
@@ -235,7 +114,7 @@ const Monitoring = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+              <Button variant="outline" size="sm" onClick={() => refreshData()} disabled={isRefreshing}>
                 <RefreshCw className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")} />
                 <span className="hidden sm:inline">Refresh</span>
               </Button>
@@ -250,22 +129,22 @@ const Monitoring = () => {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
             <GaugeChart
               title="Total Campus Consumption"
-              value={Number(totalConsumption.toFixed(1))}
+              value={Number(stats.totalConsumption.toFixed(1))}
               max={50}
-              unit="kW"
-              status={totalConsumption > 40 ? "alert" : totalConsumption > 30 ? "warning" : "normal"}
+              unit="kWh"
+              status={stats.totalConsumption > 40 ? "alert" : stats.totalConsumption > 30 ? "warning" : "normal"}
             />
             <GaugeChart
               title="Peak Load Today"
-              value={Number(peakLoad.toFixed(1))}
+              value={Number(stats.peakLoad.toFixed(1))}
               max={50}
               unit="kW"
-              status={peakLoad > 10 ? "warning" : "normal"}
+              status={stats.peakLoad > 10 ? "warning" : "normal"}
             />
             <GaugeChart
               title="Active Devices"
-              value={activeDevices}
-              max={devices.length}
+              value={stats.activeDevices}
+              max={stats.totalDevices}
               unit=""
               status="normal"
             />

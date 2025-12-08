@@ -16,7 +16,8 @@ export const GaugeChart = ({
   unit,
   status = "normal" 
 }: GaugeChartProps) => {
-  const percentage = (value / max) * 100;
+  // Pastikan percentage tidak lebih dari 100
+  const percentage = Math.min((value / max) * 100, 100);
   
   const getColor = () => {
     if (status === "alert" || percentage > 90) return "text-alert";

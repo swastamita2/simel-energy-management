@@ -1,11 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
-import { Lightbulb, Wind, Monitor, Wifi, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import * as Icons from "lucide-react";
 
 interface DeviceControlProps {
   name: string;
@@ -34,14 +33,17 @@ export const DeviceControl = ({
     setIsOn(status === "on");
   }, [power, status]);
 
-  const icons = {
-    light: Lightbulb,
-    ac: Wind,
-    projector: Monitor,
-    other: Wifi,
+  const getIcon = () => {
+    switch (type) {
+      case 'light': return Icons.Lightbulb;
+      case 'ac': return Icons.Fan;
+      case 'projector': return Icons.MonitorPlay;
+      case 'other': return Icons.Zap;
+      default: return Icons.Zap;
+    }
   };
 
-  const Icon = icons[type];
+  const Icon = getIcon();
 
   const statusColors = {
     on: "bg-success/10 text-success border-success/20",
@@ -101,7 +103,7 @@ export const DeviceControl = ({
       {/* Offline Warning */}
       {status === "offline" && (
         <div className="flex items-center gap-2 p-2 mb-3 rounded-lg bg-alert/10 border border-alert/20">
-          <AlertCircle className="h-4 w-4 text-alert shrink-0" />
+          <Icons.AlertCircle className="h-4 w-4 text-alert shrink-0" />
           <span className="text-xs text-alert">Device not responding</span>
         </div>
       )}
