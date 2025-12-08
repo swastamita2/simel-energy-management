@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AlertCircle } from 'lucide-react';
@@ -29,14 +29,15 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({
       error,
       errorInfo,
     });
 
-    // You can also log the error to an error reporting service here
-    // logErrorToService(error, errorInfo);
+    // Log error to service in production
+    if (import.meta.env.PROD) {
+      // logErrorToService(error, errorInfo);
+    }
   }
 
   handleReset = () => {

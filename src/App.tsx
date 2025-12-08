@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import Automation from "./pages/Automation";
 import NotFound from "./pages/NotFound";
 
+// Initialize QueryClient once outside component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

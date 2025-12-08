@@ -74,6 +74,28 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
 
   const debouncedQuery = useDebounce(query, 300);
 
+  // Perform search - memoized to prevent unnecessary recalculations
+  const performSearch = useCallback((searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      const filtered = mockSearchData.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setResults(filtered);
+      setLoading(false);
+    }, 200);
+  }, []);
+
   // Load recent searches from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('recentSearches');
@@ -86,62 +108,41 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     }
   }, []);
 
-  // Search function
-  const performSearch = useCallback((searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const filtered = mockSearchData.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setResults(filtered);
-      setLoading(false);
-    }, 300);
-  }, []);
-
   // Trigger search when debounced query changes
   useEffect(() => {
     performSearch(debouncedQuery);
   }, [debouncedQuery, performSearch]);
 
-  const saveRecentSearch = (searchTerm: string) => {
+  const saveRecentSearch = useCallback((searchTerm: string) => {
     if (!searchTerm.trim()) return;
     
     const updated = [searchTerm, ...recentSearches.filter(s => s !== searchTerm)].slice(0, 5);
     setRecentSearches(updated);
     localStorage.setItem('recentSearches', JSON.stringify(updated));
-  };
+  }, [recentSearches]);
 
-  const handleResultClick = (result: SearchResult) => {
+  const handleResultClick = useCallback((result: SearchResult) => {
     saveRecentSearch(query);
     window.location.href = result.url;
     onOpenChange(false);
     setQuery('');
-  };
+  }, [query, saveRecentSearch, onOpenChange]);
 
-  const handleRecentSearchClick = (search: string) => {
+  const handleRecentSearchClick = useCallback((search: string) => {
     setQuery(search);
-  };
+  }, []);
 
-  const clearRecentSearches = () => {
+  const clearRecentSearches = useCallback(() => {
     setRecentSearches([]);
     localStorage.removeItem('recentSearches');
-  };
+  }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
       onOpenChange(false);
       setQuery('');
     }
-  };
+  }, [onOpenChange]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

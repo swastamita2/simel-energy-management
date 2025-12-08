@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { User, LoginCredentials } from '@/types';
 import { authService } from '@/services/authService';
 import { useToast } from '@/hooks/use-toast';
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (credentials: LoginCredentials) => {
+  const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
       const response = await authService.login(credentials);
@@ -63,9 +63,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [toast]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await authService.logout();
       setUser(null);
@@ -80,21 +80,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         description: 'Terjadi kesalahan saat logout',
       });
     }
-  };
+  }, [toast]);
 
-  const updateUser = (updatedUser: User) => {
+  const updateUser = useCallback((updatedUser: User) => {
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
-  };
+  }, []);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     isLoading,
     login,
     logout,
     updateUser,
-  };
+  }), [user, isLoading, login, logout, updateUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

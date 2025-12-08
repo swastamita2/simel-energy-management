@@ -208,7 +208,7 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const updateDeviceStatus = (deviceId: string, status: 'on' | 'off') => {
+  const updateDeviceStatus = useCallback((deviceId: string, status: 'on' | 'off') => {
     setDevices(prev => {
       const updated = prev.map(device => {
         if (device.id === deviceId) {
@@ -242,9 +242,9 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setLastUpdate(new Date());
-  };
+  }, []);
 
-  const updateDevicePower = (deviceId: string, power: number) => {
+  const updateDevicePower = useCallback((deviceId: string, power: number) => {
     setDevices(prev => {
       const updated = prev.map(device => {
         if (device.id === deviceId) {
@@ -276,9 +276,9 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setLastUpdate(new Date());
-  };
+  }, []);
 
-  const toggleRoom = (roomId: string) => {
+  const toggleRoom = useCallback((roomId: string) => {
     setRooms(prev => {
       const room = prev.find(r => r.id === roomId);
       if (!room) return prev;
@@ -316,15 +316,15 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setLastUpdate(new Date());
-  };
+  }, []);
 
-  const resolveAlert = (alertId: number) => {
+  const resolveAlert = useCallback((alertId: number) => {
     setAlerts(prev => prev.map(alert => 
       alert.id === alertId ? { ...alert, type: 'resolved' as const } : alert
     ));
-  };
+  }, []);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     setIsRefreshing(true);
     
     // Simulate API call
@@ -348,9 +348,9 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
 
     setLastUpdate(new Date());
     setIsRefreshing(false);
-  };
+  }, []);
 
-  const value: EnergyContextType = {
+  const value: EnergyContextType = useMemo(() => ({
     devices,
     rooms,
     stats,
@@ -363,7 +363,7 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     refreshData,
     isRefreshing,
     lastUpdate,
-  };
+  }), [devices, rooms, stats, realtimeData, weeklyData, updateDeviceStatus, updateDevicePower, toggleRoom, resolveAlert, refreshData, isRefreshing, lastUpdate]);
 
   return (
     <EnergyContext.Provider value={value}>
