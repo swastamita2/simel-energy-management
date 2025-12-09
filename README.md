@@ -43,15 +43,43 @@ Real-time monitoring and analytics dashboard for ITPLN campus energy facilities.
 - 📉 Efficiency metrics
 - 📋 Custom reports generation
 
+### Admin Management System (NEW!)
+
+- 🏢 **Rooms Management**
+  - Full CRUD operations for building rooms
+  - Real-time device count and consumption tracking
+  - Export/Import JSON for backup
+  - Search and filter by building
+  - Stats dashboard with active room tracking
+
+- 🔌 **Devices Management**
+  - Complete device lifecycle management
+  - 📄 CSV bulk import with validation
+  - 🎨 4 pre-built device templates:
+    - Standard Lab (2 AC + Projector + 10 Computers + Light)
+    - Smart Classroom (AC + Projector + Sound + 2 Lights)
+    - Office Space (AC + 5 Computers + Light)
+    - Auditorium (4 AC + 2 Projectors + Sound + Stage Lights)
+  - Advanced filtering (by room, type, status)
+  - Real-time stats dashboard
+  - Download CSV template for easy import
+
+- 💾 **Data Persistence**
+  - localStorage auto-sync (no database required)
+  - Export/Import functionality for data portability
+  - Template management system
+
 ### Additional Features
 
 - 🎨 Modern, responsive UI with shadcn/ui
 - 🌓 Dark mode support
 - 📱 Mobile-friendly design
-- 🔐 Authentication & authorization (ready)
+- 🔐 Authentication & authorization (role-based access)
+- 🔍 Advanced search (Ctrl+K) with direct navigation
 - 🧪 Comprehensive testing setup
 - 📝 TypeScript for type safety
 - 🚀 Fast development with Vite
+- ⚡ Optimized with React performance patterns
 
 ## 🛠 Tech Stack
 
@@ -130,9 +158,23 @@ web-simul/
 │   ├── components/       # Reusable UI components
 │   │   ├── ui/          # shadcn/ui components
 │   │   ├── dashboard/   # Dashboard components
-│   │   └── monitoring/  # Monitoring components
+│   │   ├── monitoring/  # Monitoring components
+│   │   └── auth/        # Authentication components
 │   ├── pages/           # Page components
+│   │   ├── Dashboard.tsx
+│   │   ├── Monitoring.tsx
+│   │   ├── Analytics.tsx
+│   │   ├── RoomsManagement.tsx      # NEW: Rooms CRUD
+│   │   ├── DevicesManagement.tsx    # NEW: Devices CRUD
+│   │   ├── Reports.tsx
+│   │   ├── Automation.tsx
+│   │   ├── Users.tsx
+│   │   └── Settings.tsx
 │   ├── layouts/         # Layout components
+│   ├── contexts/        # React contexts
+│   │   ├── EnergyContext.tsx    # Energy data & CRUD methods
+│   │   ├── AuthContext.tsx
+│   │   └── ThemeContext.tsx
 │   ├── services/        # API services
 │   │   ├── api.ts       # API client
 │   │   ├── energyService.ts
@@ -186,6 +228,83 @@ npm run test:coverage    # Generate coverage report
 | `VITE_ENABLE_MOCK_DATA` | Use mock data              | `true`                      |
 | `VITE_ENABLE_DEV_TOOLS` | Enable dev tools           | `true`                      |
 | `VITE_REFRESH_INTERVAL` | Data refresh interval (ms) | `5000`                      |
+
+### Admin Management System Usage
+
+#### Rooms Management
+
+Access via sidebar menu "Rooms" (admin only) or search (Ctrl+K → "rooms").
+
+**Features:**
+- ➕ Add new rooms with building assignment
+- ✏️ Edit room details and status
+- 🗑️ Delete rooms (with device warning)
+- 📊 View room statistics and consumption
+- 📤 Export/Import room data as JSON
+- 🔍 Search and filter by building
+
+**Quick Actions:**
+1. Click "Add Room" button
+2. Fill in room name and building
+3. Enable/disable room status
+4. Save and room appears in table
+
+#### Devices Management
+
+Access via sidebar menu "Devices" (admin only) or search (Ctrl+K → "devices").
+
+**Features:**
+- ➕ Add devices manually or via CSV
+- ✏️ Edit device specifications
+- 🗑️ Delete individual devices
+- 📄 CSV bulk import with validation
+- 🎨 Apply pre-built templates
+- 🔍 Advanced filtering (room, type, status)
+- 📊 Real-time statistics dashboard
+
+**CSV Import:**
+1. Click "CSV Import" button
+2. Download template or paste CSV data
+3. Preview imported devices
+4. Confirm import - automatic validation
+
+**CSV Format:**
+```csv
+name,type,room,building,maxPower,status
+AC Unit 1,AC,Lab Komputer 1,Gedung A - Lt. 2,1500,on
+Projector 1,Projector,Lab Komputer 1,Gedung A - Lt. 2,300,on
+Computer 1,Computer,Lab Komputer 1,Gedung A - Lt. 2,400,on
+```
+
+**Device Templates:**
+1. Click "Templates" button
+2. Choose from 4 pre-built templates
+3. Select target room
+4. Click "Apply" - devices auto-created
+
+**Available Templates:**
+- **Standard Lab**: 2 AC + Projector + 10 Computers + Light (5 devices)
+- **Smart Classroom**: AC + Projector + Sound System + 2 Lights (5 devices)
+- **Office Space**: AC + 5 Computers + Light Panel (3 devices)
+- **Auditorium**: 4 AC + 2 Projectors + Sound System + Stage Lights (4 devices)
+
+#### Search Integration
+
+Press **Ctrl+K** anywhere in the app to open quick search:
+
+- Search for "rooms" → Access Rooms Management
+- Search for "devices" → Access Devices Management
+- Search for specific room name → Jump to Rooms Management
+- Search for specific device → Jump to Devices Management
+- Search any page name for quick navigation
+
+#### Data Persistence
+
+All data is automatically saved to localStorage:
+- Changes sync in real-time across all pages
+- No database setup required
+- Export/Import for backup and portability
+- Template library persists between sessions
 
 ### Code Style
 
