@@ -278,6 +278,7 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
   // Update stats whenever devices or rooms change
   useEffect(() => {
     setStats(calculateStats());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [devices, rooms, alerts]);
 
   // Real-time updates every 30 seconds
@@ -472,16 +473,17 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const deleteRoom = useCallback((id: string) => {
-    // Delete room and all its devices
-    const room = rooms.find(r => r.id === id);
-    if (room) {
-      setDevices(prev => prev.filter(d => 
-        !(d.room === room.name && d.building === room.building)
-      ));
-    }
-    setRooms(prev => prev.filter(room => room.id !== id));
+    setRooms(prev => {
+      const room = prev.find(r => r.id === id);
+      if (room) {
+        setDevices(current => current.filter(d => 
+          !(d.room === room.name && d.building === room.building)
+        ));
+      }
+      return prev.filter(r => r.id !== id);
+    });
     setLastUpdate(new Date());
-  }, [rooms]);
+  }, []);
 
   // CRUD Devices
   const addDevice = useCallback((device: Omit<Device, 'id'>) => {
@@ -489,43 +491,13 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
       ...device,
       id: String(Date.now() + Math.random()),
     };
-    setDevices(prev => [...prev, newDevice]);
-    
-    // Update room stats
-    setRooms(prev => prev.map(room => {
-      if (room.name === device.room && room.building === device.building) {
-        const roomDevices = [...devices, newDevice].filter(d => 
-          d.room === room.name && d.building === room.building
-        );
-        return {
-          ...room,
-          totalDevices: roomDevices.length,
-          devicesOn: roomDevices.filter(d => d.status === 'on').length,
-        };
-      }
-      return room;
-    }));
-    
-    setLastUpdate(new Date());
-  }, [devices]);
-
-  const updateDevice = useCallback((id: string, updates: Partial<Device>) => {
-    setDevices(prev => prev.map(device => 
-      device.id === id ? { ...device, ...updates } : device
-    ));
-    setLastUpdate(new Date());
-  }, []);
-
-  const deleteDevice = useCallback((id: string) => {
-    const device = devices.find(d => d.id === id);
-    setDevices(prev => prev.filter(d => d.id !== id));
-    
-    // Update room stats
-    if (device) {
-      setRooms(prev => prev.map(room => {
+    setDevices(prev => {
+      const updated = [...prev, newDevice];
+      // Update room stats
+      setRooms(rooms => rooms.map(room => {
         if (room.name === device.room && room.building === device.building) {
-          const roomDevices = devices.filter(d => 
-            d.id !== id && d.room === room.name && d.building === room.building
+          const roomDevices = updated.filter(d => 
+            d.room === room.name && d.building === room.building
           );
           return {
             ...room,
@@ -535,10 +507,46 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
         }
         return room;
       }));
-    }
+      return updated;
+    });
     
     setLastUpdate(new Date());
-  }, [devices]);
+  }, []);
+
+  const updateDevice = useCallback((id: string, updates: Partial<Device>) => {
+    setDevices(prev => prev.map(device => 
+      device.id === id ? { ...device, ...updates } : device
+    ));
+    setLastUpdate(new Date());
+  }, []);
+
+  const deleteDevice = useCallback((id: string) => {
+    setDevices(prev => {
+      const device = prev.find(d => d.id === id);
+      const updated = prev.filter(d => d.id !== id);
+      
+      // Update room stats
+      if (device) {
+        setRooms(rooms => rooms.map(room => {
+          if (room.name === device.room && room.building === device.building) {
+            const roomDevices = updated.filter(d => 
+              d.room === room.name && d.building === room.building
+            );
+            return {
+              ...room,
+              totalDevices: roomDevices.length,
+              devicesOn: roomDevices.filter(d => d.status === 'on').length,
+            };
+          }
+          return room;
+        }));
+      }
+      
+      return updated;
+    });
+    
+    setLastUpdate(new Date());
+  }, []);
 
   // Import CSV
   const importDevicesFromCSV = useCallback(async (csvData: string): Promise<{ success: number; errors: string[] }> => {
@@ -615,35 +623,42 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
 
   // Apply Template
   const applyTemplate = useCallback((templateId: string, roomName: string, building: string) => {
-    const template = templates.find(t => t.id === templateId);
-    if (!template) return;
-    
-    const newDevices: Device[] = template.devices.map((device, index) => ({
-      ...device,
-      id: String(Date.now() + Math.random() + index),
-      room: roomName,
-      building,
-    }));
-    
-    setDevices(prev => [...prev, ...newDevices]);
-    
-    // Update room stats
-    setRooms(prev => prev.map(room => {
-      if (room.name === roomName && room.building === building) {
-        const roomDevices = [...devices, ...newDevices].filter(d => 
-          d.room === roomName && d.building === building
-        );
-        return {
-          ...room,
-          totalDevices: roomDevices.length,
-          devicesOn: roomDevices.filter(d => d.status === 'on').length,
-        };
-      }
-      return room;
-    }));
-    
-    setLastUpdate(new Date());
-  }, [templates, devices]);
+    setTemplates(current => {
+      const template = current.find(t => t.id === templateId);
+      if (!template) return current;
+      
+      const newDevices: Device[] = template.devices.map((device, index) => ({
+        ...device,
+        id: String(Date.now() + Math.random() + index),
+        room: roomName,
+        building,
+      }));
+      
+      setDevices(prev => {
+        const updated = [...prev, ...newDevices];
+        
+        // Update room stats
+        setRooms(rooms => rooms.map(room => {
+          if (room.name === roomName && room.building === building) {
+            const roomDevices = updated.filter(d => 
+              d.room === roomName && d.building === building
+            );
+            return {
+              ...room,
+              totalDevices: roomDevices.length,
+              devicesOn: roomDevices.filter(d => d.status === 'on').length,
+            };
+          }
+          return room;
+        }));
+        
+        return updated;
+      });
+      
+      setLastUpdate(new Date());
+      return current;
+    });
+  }, []);
 
   const addTemplate = useCallback((template: Omit<DeviceTemplate, 'id'>) => {
     const newTemplate: DeviceTemplate = {
@@ -676,7 +691,10 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
       if (data.templates) setTemplates(data.templates);
       setLastUpdate(new Date());
     } catch (error) {
-      console.error('Failed to import data:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to import data:', error);
+      }
+      throw new Error('Invalid JSON data format');
     }
   }, []);
 
