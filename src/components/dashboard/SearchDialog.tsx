@@ -21,9 +21,11 @@ const staticPages: SearchResult[] = [
   { id: 'p2', type: 'page', title: 'Monitoring', subtitle: 'Real-time device monitoring', url: '/monitoring' },
   { id: 'p3', type: 'page', title: 'Analytics', subtitle: 'Energy analytics and insights', url: '/analytics' },
   { id: 'p4', type: 'page', title: 'Reports', subtitle: 'Generate and view reports', url: '/reports' },
-  { id: 'p5', type: 'page', title: 'Users', subtitle: 'User management', url: '/users' },
-  { id: 'p6', type: 'page', title: 'Settings', subtitle: 'Application settings', url: '/settings' },
-  { id: 'p7', type: 'page', title: 'Automation', subtitle: 'Automation rules', url: '/automation' },
+  { id: 'p5', type: 'page', title: 'Rooms Management', subtitle: 'Manage building rooms and spaces', url: '/rooms-management' },
+  { id: 'p6', type: 'page', title: 'Devices Management', subtitle: 'Manage all monitoring devices', url: '/devices-management' },
+  { id: 'p7', type: 'page', title: 'Users', subtitle: 'User management', url: '/users' },
+  { id: 'p8', type: 'page', title: 'Settings', subtitle: 'Application settings', url: '/settings' },
+  { id: 'p9', type: 'page', title: 'Automation', subtitle: 'Automation rules', url: '/automation' },
 ];
 
 const getTypeColor = (type: SearchResult['type']) => {
@@ -67,7 +69,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
       type: 'room' as const,
       title: room.name,
       subtitle: `${room.building} • ${room.devicesOn}/${room.totalDevices} devices active`,
-      url: '/monitoring',
+      url: '/rooms-management',
     }));
 
     const deviceResults: SearchResult[] = devices.map(device => ({
@@ -75,7 +77,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
       type: 'device' as const,
       title: device.name,
       subtitle: `${device.room} • ${device.building} • ${device.status === 'on' ? 'Active' : 'Inactive'}`,
-      url: '/monitoring',
+      url: '/devices-management',
     }));
 
     return [...roomResults, ...deviceResults, ...staticPages];

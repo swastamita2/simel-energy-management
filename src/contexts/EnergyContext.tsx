@@ -50,6 +50,13 @@ export interface ConsumptionData {
   efficiency: number;
 }
 
+export interface DeviceTemplate {
+  id: string;
+  name: string;
+  description: string;
+  devices: Omit<Device, 'id' | 'room' | 'building'>[];
+}
+
 interface EnergyContextType {
   // Real-time data
   devices: Device[];
@@ -57,6 +64,7 @@ interface EnergyContextType {
   stats: EnergyStats;
   realtimeData: ConsumptionData[];
   weeklyData: ConsumptionData[];
+  templates: DeviceTemplate[];
   
   // Actions
   updateDeviceStatus: (deviceId: string, status: 'on' | 'off') => void;
@@ -65,12 +73,81 @@ interface EnergyContextType {
   resolveAlert: (alertId: number) => void;
   refreshData: () => Promise<void>;
   
+  // CRUD Rooms
+  addRoom: (room: Omit<Room, 'id'>) => void;
+  updateRoom: (id: string, updates: Partial<Room>) => void;
+  deleteRoom: (id: string) => void;
+  
+  // CRUD Devices
+  addDevice: (device: Omit<Device, 'id'>) => void;
+  updateDevice: (id: string, updates: Partial<Device>) => void;
+  deleteDevice: (id: string) => void;
+  importDevicesFromCSV: (csvData: string) => Promise<{ success: number; errors: string[] }>;
+  
+  // Templates
+  applyTemplate: (templateId: string, roomName: string, building: string) => void;
+  addTemplate: (template: Omit<DeviceTemplate, 'id'>) => void;
+  deleteTemplate: (id: string) => void;
+  
+  // Export/Import
+  exportData: () => string;
+  importData: (jsonData: string) => void;
+  
   // State
   isRefreshing: boolean;
   lastUpdate: Date;
 }
 
 const EnergyContext = createContext<EnergyContextType | undefined>(undefined);
+
+// Device Templates
+const initialTemplates: DeviceTemplate[] = [
+  {
+    id: 't1',
+    name: 'Standard Lab',
+    description: 'Complete setup for computer lab',
+    devices: [
+      { name: 'AC Unit 1', type: 'AC', status: 'on', power: 1200, maxPower: 1500, temperature: 24 },
+      { name: 'AC Unit 2', type: 'AC', status: 'on', power: 1200, maxPower: 1500, temperature: 24 },
+      { name: 'Projector', type: 'Projector', status: 'on', power: 300, maxPower: 500 },
+      { name: 'Light Panel', type: 'Light', status: 'on', power: 200, maxPower: 300 },
+      { name: 'Computers 1-10', type: 'Computer', status: 'on', power: 800, maxPower: 1000 },
+    ],
+  },
+  {
+    id: 't2',
+    name: 'Smart Classroom',
+    description: 'Modern classroom setup',
+    devices: [
+      { name: 'AC Unit', type: 'AC', status: 'on', power: 1100, maxPower: 1500, temperature: 26 },
+      { name: 'Projector', type: 'Projector', status: 'on', power: 300, maxPower: 500 },
+      { name: 'Sound System', type: 'Other', status: 'on', power: 200, maxPower: 400 },
+      { name: 'Light Panel 1', type: 'Light', status: 'on', power: 150, maxPower: 300 },
+      { name: 'Light Panel 2', type: 'Light', status: 'on', power: 150, maxPower: 300 },
+    ],
+  },
+  {
+    id: 't3',
+    name: 'Office Space',
+    description: 'Basic office equipment',
+    devices: [
+      { name: 'AC Unit', type: 'AC', status: 'on', power: 950, maxPower: 1500, temperature: 26 },
+      { name: 'Computers 1-5', type: 'Computer', status: 'on', power: 750, maxPower: 1000 },
+      { name: 'Light Panel', type: 'Light', status: 'on', power: 180, maxPower: 300 },
+    ],
+  },
+  {
+    id: 't4',
+    name: 'Auditorium',
+    description: 'Large venue equipment',
+    devices: [
+      { name: 'AC Units 1-4', type: 'AC', status: 'on', power: 4800, maxPower: 6000, temperature: 23 },
+      { name: 'Stage Lighting', type: 'Light', status: 'on', power: 1200, maxPower: 2000 },
+      { name: 'Sound System', type: 'Other', status: 'on', power: 800, maxPower: 1500 },
+      { name: 'Projector Array', type: 'Projector', status: 'on', power: 1500, maxPower: 2000 },
+    ],
+  },
+];
 
 // Initial mock data
 const initialDevices: Device[] = [
@@ -125,8 +202,22 @@ const initialRooms: Room[] = [
 ];
 
 export const EnergyProvider = ({ children }: { children: ReactNode }) => {
-  const [devices, setDevices] = useState<Device[]>(initialDevices);
-  const [rooms, setRooms] = useState<Room[]>(initialRooms);
+  // Load from localStorage or use initial data
+  const [devices, setDevices] = useState<Device[]>(() => {
+    const stored = localStorage.getItem('energy-devices');
+    return stored ? JSON.parse(stored) : initialDevices;
+  });
+  
+  const [rooms, setRooms] = useState<Room[]>(() => {
+    const stored = localStorage.getItem('energy-rooms');
+    return stored ? JSON.parse(stored) : initialRooms;
+  });
+  
+  const [templates, setTemplates] = useState<DeviceTemplate[]>(() => {
+    const stored = localStorage.getItem('energy-templates');
+    return stored ? JSON.parse(stored) : initialTemplates;
+  });
+  
   const [realtimeData, setRealtimeData] = useState<ConsumptionData[]>([
     { time: "00:00", consumption: 245, efficiency: 92 },
     { time: "04:00", consumption: 189, efficiency: 95 },
@@ -350,20 +441,272 @@ export const EnergyProvider = ({ children }: { children: ReactNode }) => {
     setIsRefreshing(false);
   }, []);
 
+  // Sync to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem('energy-devices', JSON.stringify(devices));
+  }, [devices]);
+
+  useEffect(() => {
+    localStorage.setItem('energy-rooms', JSON.stringify(rooms));
+  }, [rooms]);
+
+  useEffect(() => {
+    localStorage.setItem('energy-templates', JSON.stringify(templates));
+  }, [templates]);
+
+  // CRUD Rooms
+  const addRoom = useCallback((room: Omit<Room, 'id'>) => {
+    const newRoom: Room = {
+      ...room,
+      id: String(Date.now()),
+    };
+    setRooms(prev => [...prev, newRoom]);
+    setLastUpdate(new Date());
+  }, []);
+
+  const updateRoom = useCallback((id: string, updates: Partial<Room>) => {
+    setRooms(prev => prev.map(room => 
+      room.id === id ? { ...room, ...updates } : room
+    ));
+    setLastUpdate(new Date());
+  }, []);
+
+  const deleteRoom = useCallback((id: string) => {
+    // Delete room and all its devices
+    const room = rooms.find(r => r.id === id);
+    if (room) {
+      setDevices(prev => prev.filter(d => 
+        !(d.room === room.name && d.building === room.building)
+      ));
+    }
+    setRooms(prev => prev.filter(room => room.id !== id));
+    setLastUpdate(new Date());
+  }, [rooms]);
+
+  // CRUD Devices
+  const addDevice = useCallback((device: Omit<Device, 'id'>) => {
+    const newDevice: Device = {
+      ...device,
+      id: String(Date.now() + Math.random()),
+    };
+    setDevices(prev => [...prev, newDevice]);
+    
+    // Update room stats
+    setRooms(prev => prev.map(room => {
+      if (room.name === device.room && room.building === device.building) {
+        const roomDevices = [...devices, newDevice].filter(d => 
+          d.room === room.name && d.building === room.building
+        );
+        return {
+          ...room,
+          totalDevices: roomDevices.length,
+          devicesOn: roomDevices.filter(d => d.status === 'on').length,
+        };
+      }
+      return room;
+    }));
+    
+    setLastUpdate(new Date());
+  }, [devices]);
+
+  const updateDevice = useCallback((id: string, updates: Partial<Device>) => {
+    setDevices(prev => prev.map(device => 
+      device.id === id ? { ...device, ...updates } : device
+    ));
+    setLastUpdate(new Date());
+  }, []);
+
+  const deleteDevice = useCallback((id: string) => {
+    const device = devices.find(d => d.id === id);
+    setDevices(prev => prev.filter(d => d.id !== id));
+    
+    // Update room stats
+    if (device) {
+      setRooms(prev => prev.map(room => {
+        if (room.name === device.room && room.building === device.building) {
+          const roomDevices = devices.filter(d => 
+            d.id !== id && d.room === room.name && d.building === room.building
+          );
+          return {
+            ...room,
+            totalDevices: roomDevices.length,
+            devicesOn: roomDevices.filter(d => d.status === 'on').length,
+          };
+        }
+        return room;
+      }));
+    }
+    
+    setLastUpdate(new Date());
+  }, [devices]);
+
+  // Import CSV
+  const importDevicesFromCSV = useCallback(async (csvData: string): Promise<{ success: number; errors: string[] }> => {
+    const errors: string[] = [];
+    let successCount = 0;
+    
+    try {
+      const lines = csvData.trim().split('\n');
+      if (lines.length < 2) {
+        return { success: 0, errors: ['CSV file is empty or invalid'] };
+      }
+      
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const requiredHeaders = ['name', 'type', 'room', 'building', 'maxpower', 'status'];
+      
+      const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+      if (missingHeaders.length > 0) {
+        return { success: 0, errors: [`Missing required columns: ${missingHeaders.join(', ')}`] };
+      }
+      
+      const newDevices: Device[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        const values = line.split(',').map(v => v.trim());
+        const row: any = {};
+        headers.forEach((header, index) => {
+          row[header] = values[index];
+        });
+        
+        try {
+          const maxPower = parseInt(row.maxpower);
+          if (isNaN(maxPower) || maxPower <= 0) {
+            errors.push(`Line ${i + 1}: Invalid maxPower value`);
+            continue;
+          }
+          
+          const status = row.status.toLowerCase() as 'on' | 'off';
+          if (status !== 'on' && status !== 'off') {
+            errors.push(`Line ${i + 1}: Status must be 'on' or 'off'`);
+            continue;
+          }
+          
+          newDevices.push({
+            id: String(Date.now() + Math.random() + i),
+            name: row.name,
+            type: row.type,
+            room: row.room,
+            building: row.building,
+            maxPower,
+            power: status === 'on' ? Math.round(maxPower * 0.8) : 0,
+            status,
+            temperature: row.type.toLowerCase() === 'ac' ? 24 : undefined,
+          });
+          
+          successCount++;
+        } catch (error) {
+          errors.push(`Line ${i + 1}: ${error}`);
+        }
+      }
+      
+      if (newDevices.length > 0) {
+        setDevices(prev => [...prev, ...newDevices]);
+        setLastUpdate(new Date());
+      }
+      
+      return { success: successCount, errors };
+    } catch (error) {
+      return { success: 0, errors: [`Failed to parse CSV: ${error}`] };
+    }
+  }, []);
+
+  // Apply Template
+  const applyTemplate = useCallback((templateId: string, roomName: string, building: string) => {
+    const template = templates.find(t => t.id === templateId);
+    if (!template) return;
+    
+    const newDevices: Device[] = template.devices.map((device, index) => ({
+      ...device,
+      id: String(Date.now() + Math.random() + index),
+      room: roomName,
+      building,
+    }));
+    
+    setDevices(prev => [...prev, ...newDevices]);
+    
+    // Update room stats
+    setRooms(prev => prev.map(room => {
+      if (room.name === roomName && room.building === building) {
+        const roomDevices = [...devices, ...newDevices].filter(d => 
+          d.room === roomName && d.building === building
+        );
+        return {
+          ...room,
+          totalDevices: roomDevices.length,
+          devicesOn: roomDevices.filter(d => d.status === 'on').length,
+        };
+      }
+      return room;
+    }));
+    
+    setLastUpdate(new Date());
+  }, [templates, devices]);
+
+  const addTemplate = useCallback((template: Omit<DeviceTemplate, 'id'>) => {
+    const newTemplate: DeviceTemplate = {
+      ...template,
+      id: String(Date.now()),
+    };
+    setTemplates(prev => [...prev, newTemplate]);
+  }, []);
+
+  const deleteTemplate = useCallback((id: string) => {
+    setTemplates(prev => prev.filter(t => t.id !== id));
+  }, []);
+
+  // Export/Import Data
+  const exportData = useCallback(() => {
+    const data = {
+      devices,
+      rooms,
+      templates,
+      exportedAt: new Date().toISOString(),
+    };
+    return JSON.stringify(data, null, 2);
+  }, [devices, rooms, templates]);
+
+  const importData = useCallback((jsonData: string) => {
+    try {
+      const data = JSON.parse(jsonData);
+      if (data.devices) setDevices(data.devices);
+      if (data.rooms) setRooms(data.rooms);
+      if (data.templates) setTemplates(data.templates);
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Failed to import data:', error);
+    }
+  }, []);
+
   const value: EnergyContextType = useMemo(() => ({
     devices,
     rooms,
     stats,
     realtimeData,
     weeklyData,
+    templates,
     updateDeviceStatus,
     updateDevicePower,
     toggleRoom,
     resolveAlert,
     refreshData,
+    addRoom,
+    updateRoom,
+    deleteRoom,
+    addDevice,
+    updateDevice,
+    deleteDevice,
+    importDevicesFromCSV,
+    applyTemplate,
+    addTemplate,
+    deleteTemplate,
+    exportData,
+    importData,
     isRefreshing,
     lastUpdate,
-  }), [devices, rooms, stats, realtimeData, weeklyData, updateDeviceStatus, updateDevicePower, toggleRoom, resolveAlert, refreshData, isRefreshing, lastUpdate]);
+  }), [devices, rooms, stats, realtimeData, weeklyData, templates, updateDeviceStatus, updateDevicePower, toggleRoom, resolveAlert, refreshData, addRoom, updateRoom, deleteRoom, addDevice, updateDevice, deleteDevice, importDevicesFromCSV, applyTemplate, addTemplate, deleteTemplate, exportData, importData, isRefreshing, lastUpdate]);
 
   return (
     <EnergyContext.Provider value={value}>

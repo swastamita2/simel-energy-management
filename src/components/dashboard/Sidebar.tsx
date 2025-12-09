@@ -8,6 +8,8 @@ import {
   Users,
   GitBranch,
   LogOut,
+  Building2,
+  Cpu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,6 +58,18 @@ const navigation = [
     href: "/automation", 
     icon: GitBranch,
     permission: "automation.view" as const,
+  },
+  { 
+    name: "Rooms", 
+    href: "/rooms-management", 
+    icon: Building2,
+    permission: "users.view" as const,
+  },
+  { 
+    name: "Devices", 
+    href: "/devices-management", 
+    icon: Cpu,
+    permission: "users.view" as const,
   },
   { 
     name: "Users", 

@@ -16,6 +16,8 @@ import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Automation from "./pages/Automation";
+import RoomsManagement from "./pages/RoomsManagement";
+import DevicesManagement from "./pages/DevicesManagement";
 import NotFound from "./pages/NotFound";
 
 // Initialize QueryClient once outside component
@@ -107,6 +109,26 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["admin"]}>
                   <Automation />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Protected Routes - Rooms Management (Admin only) */}
+            <Route
+              path="/rooms-management"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <RoomsManagement />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Protected Routes - Devices Management (Admin only) */}
+            <Route
+              path="/devices-management"
+              element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <DevicesManagement />
                 </ProtectedRoute>
               }
             />
