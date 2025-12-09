@@ -1,5 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, X, ArrowRight, Loader2 } from 'lucide-react';
+import { useEnergy } from '@/contexts/EnergyContext';
 import {
   Dialog,
   DialogContent,
@@ -13,33 +15,15 @@ import { cn } from '@/lib/utils';
 import { useDebounce } from '@/hooks/use-debounce';
 import { SearchResult } from '@/types';
 
-// Mock search data - replace with real API search
-const mockSearchData: SearchResult[] = [
-  // Rooms
-  { id: 'r1', type: 'room', title: 'Lab Komputer 1', subtitle: 'Gedung A - Lt. 2', url: '/monitoring?room=1' },
-  { id: 'r2', type: 'room', title: 'Ruang Kuliah 201', subtitle: 'Gedung A - Lt. 2', url: '/monitoring?room=2' },
-  { id: 'r3', type: 'room', title: 'Lab Elektronika', subtitle: 'Gedung B - Lt. 1', url: '/monitoring?room=3' },
-  { id: 'r4', type: 'room', title: 'Auditorium', subtitle: 'Gedung C', url: '/monitoring?room=4' },
-  { id: 'r5', type: 'room', title: 'Perpustakaan', subtitle: 'Gedung D - Lt. 1', url: '/monitoring?room=5' },
-  
-  // Devices
-  { id: 'd1', type: 'device', title: 'LED Panel 1', subtitle: 'Lab Komputer 1', url: '/monitoring?device=1' },
-  { id: 'd2', type: 'device', title: 'AC Unit 1', subtitle: 'Lab Komputer 1', url: '/monitoring?device=2' },
-  { id: 'd3', type: 'device', title: 'Projector', subtitle: 'Ruang Kuliah 201', url: '/monitoring?device=3' },
-  { id: 'd4', type: 'device', title: 'AC Unit 2', subtitle: 'Lab Elektronika', url: '/monitoring?device=5' },
-  
-  // Pages
-  { id: 'p1', type: 'page', title: 'Dashboard', subtitle: 'Main dashboard view', url: '/' },
+// Static pages data
+const staticPages: SearchResult[] = [
+  { id: 'p1', type: 'page', title: 'Dashboard', subtitle: 'Main dashboard view', url: '/dashboard' },
   { id: 'p2', type: 'page', title: 'Monitoring', subtitle: 'Real-time device monitoring', url: '/monitoring' },
   { id: 'p3', type: 'page', title: 'Analytics', subtitle: 'Energy analytics and insights', url: '/analytics' },
   { id: 'p4', type: 'page', title: 'Reports', subtitle: 'Generate and view reports', url: '/reports' },
   { id: 'p5', type: 'page', title: 'Users', subtitle: 'User management', url: '/users' },
   { id: 'p6', type: 'page', title: 'Settings', subtitle: 'Application settings', url: '/settings' },
-  
-  // Reports
-  { id: 'rp1', type: 'report', title: 'Weekly Energy Report', subtitle: 'Last 7 days consumption', url: '/reports?id=weekly' },
-  { id: 'rp2', type: 'report', title: 'Monthly Summary', subtitle: 'Full month analysis', url: '/reports?id=monthly' },
-  { id: 'rp3', type: 'report', title: 'Device Performance', subtitle: 'Device efficiency report', url: '/reports?id=device-perf' },
+  { id: 'p7', type: 'page', title: 'Automation', subtitle: 'Automation rules', url: '/automation' },
 ];
 
 const getTypeColor = (type: SearchResult['type']) => {
@@ -67,12 +51,35 @@ interface SearchDialogProps {
 }
 
 export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
+  const navigate = useNavigate();
+  const { devices, rooms } = useEnergy();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   const debouncedQuery = useDebounce(query, 300);
+
+  // Generate search data from real context data
+  const searchData = useMemo(() => {
+    const roomResults: SearchResult[] = rooms.map(room => ({
+      id: `r-${room.id}`,
+      type: 'room' as const,
+      title: room.name,
+      subtitle: `${room.building} • ${room.devicesOn}/${room.totalDevices} devices active`,
+      url: '/monitoring',
+    }));
+
+    const deviceResults: SearchResult[] = devices.map(device => ({
+      id: `d-${device.id}`,
+      type: 'device' as const,
+      title: device.name,
+      subtitle: `${device.room} • ${device.building} • ${device.status === 'on' ? 'Active' : 'Inactive'}`,
+      url: '/monitoring',
+    }));
+
+    return [...roomResults, ...deviceResults, ...staticPages];
+  }, [devices, rooms]);
 
   // Perform search - memoized to prevent unnecessary recalculations
   const performSearch = useCallback((searchQuery: string) => {
@@ -86,15 +93,15 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     
     // Simulate API delay
     setTimeout(() => {
-      const filtered = mockSearchData.filter(
+      const filtered = searchData.filter(
         (item) =>
           item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setResults(filtered);
       setLoading(false);
-    }, 200);
-  }, []);
+    }, 150);
+  }, [searchData]);
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -123,10 +130,10 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
 
   const handleResultClick = useCallback((result: SearchResult) => {
     saveRecentSearch(query);
-    window.location.href = result.url;
+    navigate(result.url);
     onOpenChange(false);
     setQuery('');
-  }, [query, saveRecentSearch, onOpenChange]);
+  }, [query, saveRecentSearch, onOpenChange, navigate]);
 
   const handleRecentSearchClick = useCallback((search: string) => {
     setQuery(search);
