@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const RoomsManagement = () => {
-  const { rooms, addRoom, updateRoom, deleteRoom, exportData, importData } = useEnergy();
+  const { rooms, devices, addRoom, updateRoom, deleteRoom, exportData, importData } = useEnergy();
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -219,7 +219,7 @@ const RoomsManagement = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Total Devices</p>
                     <p className="text-2xl font-bold">
-                      {rooms.reduce((sum, r) => sum + r.totalDevices, 0)}
+                      {devices.length}
                     </p>
                   </div>
                 </div>

@@ -236,6 +236,7 @@ npm run test:coverage    # Generate coverage report
 Access via sidebar menu "Rooms" (admin only) or search (Ctrl+K → "rooms").
 
 **Features:**
+
 - ➕ Add new rooms with building assignment
 - ✏️ Edit room details and status
 - 🗑️ Delete rooms (with device warning)
@@ -244,6 +245,7 @@ Access via sidebar menu "Rooms" (admin only) or search (Ctrl+K → "rooms").
 - 🔍 Search and filter by building
 
 **Quick Actions:**
+
 1. Click "Add Room" button
 2. Fill in room name and building
 3. Enable/disable room status
@@ -254,6 +256,7 @@ Access via sidebar menu "Rooms" (admin only) or search (Ctrl+K → "rooms").
 Access via sidebar menu "Devices" (admin only) or search (Ctrl+K → "devices").
 
 **Features:**
+
 - ➕ Add devices manually or via CSV
 - ✏️ Edit device specifications
 - 🗑️ Delete individual devices
@@ -263,12 +266,14 @@ Access via sidebar menu "Devices" (admin only) or search (Ctrl+K → "devices").
 - 📊 Real-time statistics dashboard
 
 **CSV Import:**
+
 1. Click "CSV Import" button
 2. Download template or paste CSV data
 3. Preview imported devices
 4. Confirm import - automatic validation
 
 **CSV Format:**
+
 ```csv
 name,type,room,building,maxPower,status
 AC Unit 1,AC,Lab Komputer 1,Gedung A - Lt. 2,1500,on
@@ -277,12 +282,14 @@ Computer 1,Computer,Lab Komputer 1,Gedung A - Lt. 2,400,on
 ```
 
 **Device Templates:**
+
 1. Click "Templates" button
 2. Choose from 4 pre-built templates
 3. Select target room
 4. Click "Apply" - devices auto-created
 
 **Available Templates:**
+
 - **Standard Lab**: 2 AC + Projector + 10 Computers + Light (5 devices)
 - **Smart Classroom**: AC + Projector + Sound System + 2 Lights (5 devices)
 - **Office Space**: AC + 5 Computers + Light Panel (3 devices)
@@ -301,6 +308,7 @@ Press **Ctrl+K** anywhere in the app to open quick search:
 #### Data Persistence
 
 All data is automatically saved to localStorage:
+
 - Changes sync in real-time across all pages
 - No database setup required
 - Export/Import for backup and portability
