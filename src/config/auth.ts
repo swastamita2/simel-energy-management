@@ -91,9 +91,8 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
       { module: 'reports', actions: ['view'] }, // Review Reports
       { module: 'consumption', actions: ['view', 'edit'] }, // Manage Pola Konsumsi Energi
       { module: 'monitoring', actions: ['view'] }, // View Log Aktivitas Sistem
-      { module: 'automation', actions: ['view', 'create', 'edit'] }, // Menjalankan Aturan Otomatis (IF-THEN)
     ],
-    routes: ['/', '/monitoring', '/analytics', '/reports', '/automation'],
+    routes: ['/', '/monitoring', '/analytics', '/reports'],
   },
   // Teknisi - Maintenance hardware, menerima notifikasi anomali, menjalankan jadwal pemeriksaan perangkat
   teknisi: {
