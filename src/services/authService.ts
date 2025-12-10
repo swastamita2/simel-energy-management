@@ -16,8 +16,9 @@ export const authService = {
           // Check if email ends with @itpln.ac.id
           if (credentials.email.endsWith('@itpln.ac.id') && 
               credentials.email !== 'admin@itpln.ac.id' && 
-              credentials.email !== 'teknisi@itpln.ac.id' && 
-              credentials.email !== 'manajer@itpln.ac.id') {
+              credentials.email !== 'pimpinan@itpln.ac.id' &&
+              credentials.email !== 'manajer@itpln.ac.id' &&
+              credentials.email !== 'teknisi@itpln.ac.id') {
             // Check password (default password for mahasiswa)
             if (credentials.password !== 'mahasiswa123') {
               reject({

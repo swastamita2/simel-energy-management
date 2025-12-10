@@ -10,6 +10,7 @@ import {
   LogOut,
   Building2,
   Cpu,
+  ClipboardCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,6 +53,12 @@ const navigation = [
     href: "/reports", 
     icon: FileText,
     permission: "reports.view" as const,
+  },
+  { 
+    name: "Monitoring Laporan", 
+    href: "/monitoring-laporan", 
+    icon: ClipboardCheck,
+    permission: "monitoring-laporan.view" as const,
   },
   { 
     name: "Automation", 

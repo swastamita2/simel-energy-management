@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import Monitoring from "./pages/Monitoring";
 import Analytics from "./pages/Analytics";
 import Reports from "./pages/Reports";
+import MonitoringLaporan from "./pages/MonitoringLaporan";
 import Users from "./pages/Users";
 import Settings from "./pages/Settings";
 import Automation from "./pages/Automation";
@@ -63,11 +64,11 @@ const App = () => (
               }
             />
             
-            {/* Protected Routes - Monitoring (Teknisi & Admin) */}
+            {/* Protected Routes - Monitoring (Manajer, Teknisi & Admin) */}
             <Route
               path="/monitoring"
               element={
-                <ProtectedRoute allowedRoles={["admin", "teknisi"]}>
+                <ProtectedRoute allowedRoles={["admin", "manajer", "teknisi"]}>
                   <Monitoring />
                 </ProtectedRoute>
               }
@@ -89,6 +90,16 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["admin", "manajer"]}>
                   <Reports />
+                </ProtectedRoute>
+              }
+            />
+            
+            {/* Protected Routes - Monitoring Laporan (Pimpinan only) */}
+            <Route
+              path="/monitoring-laporan"
+              element={
+                <ProtectedRoute allowedRoles={["pimpinan"]}>
+                  <MonitoringLaporan />
                 </ProtectedRoute>
               }
             />

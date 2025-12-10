@@ -115,19 +115,23 @@ const Login: React.FC = () => {
                 <p className="font-medium text-blue-900">Admin</p>
                 <p className="text-blue-700">admin@itpln.ac.id / admin123</p>
               </div>
-              <div className="p-2 bg-green-50 rounded">
-                <p className="font-medium text-green-900">Teknisi</p>
-                <p className="text-green-700">teknisi@itpln.ac.id / teknisi123</p>
+              <div className="p-2 bg-yellow-50 rounded">
+                <p className="font-medium text-yellow-900">Pimpinan</p>
+                <p className="text-yellow-700">pimpinan@itpln.ac.id / pimpinan123</p>
               </div>
               <div className="p-2 bg-purple-50 rounded">
                 <p className="font-medium text-purple-900">Manajer</p>
                 <p className="text-purple-700">manajer@itpln.ac.id / manajer123</p>
               </div>
+              <div className="p-2 bg-green-50 rounded">
+                <p className="font-medium text-green-900">Teknisi</p>
+                <p className="text-green-700">teknisi@itpln.ac.id / teknisi123</p>
+              </div>
               <div className="p-2 bg-emerald-50 rounded border border-emerald-200">
                 <p className="font-medium text-emerald-900">Mahasiswa/Dosen</p>
                 <p className="text-emerald-700">nama@itpln.ac.id / mahasiswa123</p>
                 <p className="text-xs text-emerald-600 mt-1 italic">
-                  * Gunakan email @itpln.ac.id (selain admin/teknisi/manajer)
+                  * Gunakan email @itpln.ac.id (selain admin/pimpinan/manajer/teknisi)
                 </p>
               </div>
             </div>

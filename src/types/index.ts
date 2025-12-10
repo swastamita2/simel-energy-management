@@ -76,7 +76,7 @@ export interface PaginatedResponse<T> {
 }
 
 // User Types
-export type UserRole = 'admin' | 'teknisi' | 'manajer' | 'mahasiswa';
+export type UserRole = 'admin' | 'pimpinan' | 'manajer' | 'teknisi' | 'mahasiswa';
 
 export interface User {
   id: string;
