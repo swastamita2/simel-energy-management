@@ -1,13 +1,13 @@
-# Energy Management Dashboard 🔋⚡
+# Energy Management Dashboard
 
-Real-time monitoring and analytics dashboard for ITPLN campus energy facilities. Built with modern web technologies for optimal performance and user experience.
+A comprehensive real-time monitoring and analytics platform for ITPLN campus energy facilities. This application provides a complete solution for tracking energy consumption, managing devices, and optimizing energy efficiency across multiple buildings and rooms.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue)
 ![React](https://img.shields.io/badge/React-18.3-blue)
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Features](#features)
 - [Tech Stack](#tech-stack)
@@ -18,70 +18,74 @@ Real-time monitoring and analytics dashboard for ITPLN campus energy facilities.
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 
-## ✨ Features
+## Features
 
-### Dashboard
+### Core Dashboard Capabilities
 
-- 📊 Real-time energy consumption monitoring
-- 📈 Interactive charts and visualizations
-- 💰 Cost savings tracking
-- 🌱 Carbon reduction metrics
-- 📉 Weekly consumption trends
+- Real-time energy consumption monitoring with live data updates
+- Interactive data visualizations and analytics charts
+- Financial tracking for cost savings and ROI analysis
+- Environmental impact metrics including carbon footprint reduction
+- Historical trend analysis with weekly and monthly views
 
-### Monitoring
+### Monitoring System
 
-- 🏢 Room-level energy monitoring
-- 💡 Device control interface
-- 🌡️ Temperature monitoring
-- ⚡ Real-time power consumption
-- 🔴 Alert system for anomalies
+- Building-wide and room-level energy tracking
+- Remote device control interface with status monitoring
+- Environmental sensors integration for temperature monitoring
+- Live power consumption metrics per device
+- Automated alert system for detecting anomalies and threshold violations
 
-### Analytics
+### Analytics Engine
 
-- 📊 Historical data analysis
-- 📈 Trend forecasting
-- 📉 Efficiency metrics
-- 📋 Custom reports generation
+- Comprehensive historical data analysis
+- Predictive trend forecasting using consumption patterns
+- Performance efficiency metrics and KPI tracking
+- Custom report generation with flexible date ranges and parameters
 
-### Admin Management System (NEW!)
+### Administration Modules
 
-- 🏢 **Rooms Management**
-  - Full CRUD operations for building rooms
-  - Real-time device count and consumption tracking
-  - Export/Import JSON for backup
-  - Search and filter by building
-  - Stats dashboard with active room tracking
+**Rooms Management**
 
-- 🔌 **Devices Management**
-  - Complete device lifecycle management
-  - 📄 CSV bulk import with validation
-  - 🎨 4 pre-built device templates:
-    - Standard Lab (2 AC + Projector + 10 Computers + Light)
-    - Smart Classroom (AC + Projector + Sound + 2 Lights)
-    - Office Space (AC + 5 Computers + Light)
-    - Auditorium (4 AC + 2 Projectors + Sound + Stage Lights)
-  - Advanced filtering (by room, type, status)
-  - Real-time stats dashboard
-  - Download CSV template for easy import
+- Complete CRUD operations for managing building spaces
+- Real-time tracking of device count and energy consumption per room
+- Data export and import capabilities in JSON format for backup and migration
+- Advanced search and filtering by building, floor, or status
+- Statistics dashboard displaying active rooms and consumption patterns
 
-- 💾 **Data Persistence**
-  - localStorage auto-sync (no database required)
-  - Export/Import functionality for data portability
-  - Template management system
+**Devices Management**
 
-### Additional Features
+- Full lifecycle management for all energy-consuming devices
+- Bulk device import via CSV with built-in validation
+- Pre-configured device templates for common room types:
+  - Standard Lab: 2 AC units, 1 Projector, 10 Computers, 1 Light panel
+  - Smart Classroom: 1 AC unit, 1 Projector, 1 Sound system, 2 Lights
+  - Office Space: 1 AC unit, 5 Computers, 1 Light panel
+  - Auditorium: 4 AC units, 2 Projectors, 1 Sound system, 1 Stage lighting
+- Multi-criteria filtering (room, device type, operational status)
+- Real-time statistics dashboard with device health monitoring
+- Downloadable CSV template for streamlined data entry
 
-- 🎨 Modern, responsive UI with shadcn/ui
-- 🌓 Dark mode support
-- 📱 Mobile-friendly design
-- 🔐 Authentication & authorization (role-based access)
-- 🔍 Advanced search (Ctrl+K) with direct navigation
-- 🧪 Comprehensive testing setup
-- 📝 TypeScript for type safety
-- 🚀 Fast development with Vite
-- ⚡ Optimized with React performance patterns
+**Data Management**
 
-## 🛠 Tech Stack
+- Automatic synchronization with browser localStorage
+- No backend database required for development
+- Export and import functionality for data portability
+- Template library with persistent storage
+
+### Technical Features
+
+- Modern, responsive interface built with shadcn/ui component library
+- Dark mode support with system preference detection
+- Mobile-optimized design with touch-friendly controls
+- Role-based access control with five distinct user roles
+- Advanced search functionality with keyboard shortcuts (Ctrl+K)
+- Comprehensive test coverage with Vitest and Testing Library
+- Full TypeScript implementation for type safety and IDE support
+- Optimized build pipeline with Vite for fast development and production builds
+- Performance optimization using React best practices (memoization, lazy loading)
+
+## Tech Stack
 
 ### Frontend
 
@@ -104,14 +108,19 @@ Real-time monitoring and analytics dashboard for ITPLN campus energy facilities.
 - **Git Hooks**: Husky + Lint-staged
 - **Commit Lint**: Commitlint
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Git
+Before you begin, ensure you have the following installed on your system:
+
+- Node.js 18.x or higher
+- npm (comes with Node.js)
+- Git for version control
 
 ### Installation
+
+Follow these steps to set up the development environment:
 
 1. **Clone the repository**
 
@@ -126,7 +135,7 @@ Real-time monitoring and analytics dashboard for ITPLN campus energy facilities.
    npm install
    ```
 
-3. **Setup environment variables**
+3. **Configure environment variables**
 
    ```bash
    cp .env.example .env.local
@@ -139,16 +148,17 @@ Real-time monitoring and analytics dashboard for ITPLN campus energy facilities.
    VITE_ENABLE_MOCK_DATA=true
    ```
 
-4. **Start development server**
+4. **Start the development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Open browser**
-   Navigate to `http://localhost:8080`
+5. **Access the application**
 
-## 📁 Project Structure
+   Open your browser and navigate to `http://localhost:8080`
+
+## Project Structure
 
 ```
 web-simul/
@@ -195,7 +205,7 @@ web-simul/
 └── package.json         # Dependencies
 ```
 
-## 💻 Development
+## Development
 
 ### Available Scripts
 
@@ -229,50 +239,52 @@ npm run test:coverage    # Generate coverage report
 | `VITE_ENABLE_DEV_TOOLS` | Enable dev tools           | `true`                      |
 | `VITE_REFRESH_INTERVAL` | Data refresh interval (ms) | `5000`                      |
 
-### Admin Management System Usage
+### Administration System Usage
 
 #### Rooms Management
 
-Access via sidebar menu "Rooms" (admin only) or search (Ctrl+K → "rooms").
+The Rooms Management module is accessible through the sidebar navigation menu (admin role required) or via the quick search feature (Ctrl+K → type "rooms").
 
-**Features:**
+**Key Features:**
 
-- ➕ Add new rooms with building assignment
-- ✏️ Edit room details and status
-- 🗑️ Delete rooms (with device warning)
-- 📊 View room statistics and consumption
-- 📤 Export/Import room data as JSON
-- 🔍 Search and filter by building
+- Create new rooms with building assignment and configuration
+- Edit room details including name, building location, and operational status
+- Delete rooms with automatic validation (warns if devices are assigned)
+- View comprehensive statistics including consumption metrics
+- Export and import room data in JSON format for backup and migration
+- Search and filter capabilities by building or room name
 
-**Quick Actions:**
+**Usage Workflow:**
 
-1. Click "Add Room" button
-2. Fill in room name and building
-3. Enable/disable room status
-4. Save and room appears in table
+1. Navigate to Rooms Management from the sidebar
+2. Click the "Add Room" button to create a new space
+3. Fill in the required fields: room name and building assignment
+4. Toggle the room status (enabled/disabled)
+5. Save the configuration and the room will appear in the management table
 
 #### Devices Management
 
-Access via sidebar menu "Devices" (admin only) or search (Ctrl+K → "devices").
+The Devices Management module provides complete control over all energy-consuming devices. Access it through the sidebar menu (admin only) or quick search (Ctrl+K → type "devices").
 
-**Features:**
+**Key Features:**
 
-- ➕ Add devices manually or via CSV
-- ✏️ Edit device specifications
-- 🗑️ Delete individual devices
-- 📄 CSV bulk import with validation
-- 🎨 Apply pre-built templates
-- 🔍 Advanced filtering (room, type, status)
-- 📊 Real-time statistics dashboard
+- Manual device addition with detailed specifications
+- Bulk device import via CSV with data validation
+- Edit device properties including power ratings and operational parameters
+- Delete individual devices with confirmation
+- Apply pre-built templates for common room configurations
+- Advanced filtering by room, device type, and operational status
+- Real-time statistics dashboard with device health metrics
 
-**CSV Import:**
+**CSV Import Workflow:**
 
-1. Click "CSV Import" button
-2. Download template or paste CSV data
-3. Preview imported devices
-4. Confirm import - automatic validation
+1. Click the "CSV Import" button in the Devices Management interface
+2. Download the provided CSV template or prepare your data according to the format
+3. Paste the CSV data into the import dialog or upload a file
+4. Review the preview of devices to be imported
+5. Confirm the import operation (includes automatic validation)
 
-**CSV Format:**
+**CSV Data Format:**
 
 ```csv
 name,type,room,building,maxPower,status
@@ -281,76 +293,78 @@ Projector 1,Projector,Lab Komputer 1,Gedung A - Lt. 2,300,on
 Computer 1,Computer,Lab Komputer 1,Gedung A - Lt. 2,400,on
 ```
 
-**Device Templates:**
+**Device Template System:**
 
-1. Click "Templates" button
-2. Choose from 4 pre-built templates
-3. Select target room
-4. Click "Apply" - devices auto-created
+1. Navigate to the "Templates" tab in Devices Management
+2. Select from four pre-configured templates:
+   - **Standard Lab**: 2 AC units + 1 Projector + 10 Computers + 1 Light panel (14 devices)
+   - **Smart Classroom**: 1 AC unit + 1 Projector + 1 Sound system + 2 Lights (5 devices)
+   - **Office Space**: 1 AC unit + 5 Computers + 1 Light panel (7 devices)
+   - **Auditorium**: 4 AC units + 2 Projectors + 1 Sound system + 1 Stage lighting (8 devices)
+3. Choose the target room where devices will be created
+4. Click "Apply" to automatically generate all devices with proper configurations
 
-**Available Templates:**
+#### Quick Search Integration
 
-- **Standard Lab**: 2 AC + Projector + 10 Computers + Light (5 devices)
-- **Smart Classroom**: AC + Projector + Sound System + 2 Lights (5 devices)
-- **Office Space**: AC + 5 Computers + Light Panel (3 devices)
-- **Auditorium**: 4 AC + 2 Projectors + Sound System + Stage Lights (4 devices)
+The application includes a powerful quick search feature accessible via **Ctrl+K** keyboard shortcut:
 
-#### Search Integration
+- Search for "rooms" to quickly access Rooms Management
+- Search for "devices" to navigate to Devices Management
+- Search for specific room names to jump directly to room details
+- Search for device names to locate specific equipment
+- Navigate to any page by typing its name
 
-Press **Ctrl+K** anywhere in the app to open quick search:
+#### Data Persistence Strategy
 
-- Search for "rooms" → Access Rooms Management
-- Search for "devices" → Access Devices Management
-- Search for specific room name → Jump to Rooms Management
-- Search for specific device → Jump to Devices Management
-- Search any page name for quick navigation
+All application data is automatically persisted to browser localStorage:
 
-#### Data Persistence
+- Changes are synchronized in real-time across all pages and components
+- No backend database configuration required for development
+- Export and import functionality provides backup and data portability
+- Device template library persists between browser sessions
+- Data survives page refreshes and browser restarts
 
-All data is automatically saved to localStorage:
+### Code Quality Standards
 
-- Changes sync in real-time across all pages
-- No database setup required
-- Export/Import for backup and portability
-- Template library persists between sessions
+This project maintains high code quality through the following tools and practices:
 
-### Code Style
+- **ESLint**: Static code analysis to identify problematic patterns
+- **Prettier**: Automatic code formatting for consistency
+- **Husky**: Git hooks for pre-commit quality checks
+- **Commitlint**: Enforces conventional commit message standards
 
-This project uses:
-
-- **ESLint** for code linting
-- **Prettier** for code formatting
-- **Husky** for pre-commit hooks
-- **Commitlint** for commit message validation
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
 ```bash
 feat: add new feature
-fix: bug fix
-docs: documentation changes
-style: code style changes
-refactor: code refactoring
-test: add or update tests
-chore: maintenance tasks
+fix: resolve bug or issue
+docs: update documentation
+style: format code without logic changes
+refactor: restructure code without changing behavior
+test: add or modify tests
+chore: update build process or dependencies
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Running Tests
 
+Execute the test suite using the following commands:
+
 ```bash
-# Run all tests
+# Run all tests in watch mode
 npm run test
 
-# Run with UI
+# Run tests with interactive UI
 npm run test:ui
 
-# Generate coverage
+# Generate code coverage report
 npm run test:coverage
 ```
 
 ### Writing Tests
+
+Follow this structure for writing new tests:
 
 ```typescript
 import { describe, it, expect } from 'vitest';
@@ -364,61 +378,72 @@ describe('MyComponent', () => {
 });
 ```
 
-## 🚀 Deployment
+## Deployment
 
-### Build for Production
+### Building for Production
+
+Generate an optimized production build:
 
 ```bash
 npm run build
 ```
 
-The build output will be in the `dist/` directory.
+The compiled output will be available in the `dist/` directory, ready for deployment to any static hosting service.
 
-### Deploy to Vercel
+### Deployment Options
+
+**Vercel Deployment**
 
 ```bash
 npm install -g vercel
 vercel deploy --prod
 ```
 
-### Deploy to Netlify
+**Netlify Deployment**
 
 ```bash
 npm install -g netlify-cli
 netlify deploy --prod --dir=dist
 ```
 
-### Deploy via Lovable
+**Lovable Platform**
 
-Simply open [Lovable](https://lovable.dev/projects/94fe7620-77e0-4458-b921-7bb8f6ef0b98) and click on Share → Publish.
+Navigate to [Lovable](https://lovable.dev/projects/94fe7620-77e0-4458-b921-7bb8f6ef0b98) and use the Share → Publish feature for instant deployment.
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Contributions are welcome and appreciated. Please review [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'feat: add some amazing feature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+**Contribution Workflow:**
 
-## 👥 Team
+1. Fork the repository to your GitHub account
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes following conventional commit standards (`git commit -m 'feat: add some amazing feature'`)
+4. Push the branch to your fork (`git push origin feature/AmazingFeature`)
+5. Submit a Pull Request with a detailed description of your changes
+
+## Project Team
 
 **Institut Teknologi PLN**
 
-- Energy Management Team
+Energy Management Development Team
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- [shadcn/ui](https://ui.shadcn.com/) for the beautiful UI components
-- [Lucide](https://lucide.dev/) for the icons
-- [Recharts](https://recharts.org/) for the charts
-- Built with [Lovable](https://lovable.dev/)
+This project leverages several excellent open-source libraries and tools:
 
-## 📞 Support
+- [shadcn/ui](https://ui.shadcn.com/) - High-quality React component library
+- [Lucide](https://lucide.dev/) - Beautiful icon set
+- [Recharts](https://recharts.org/) - Composable charting library
+- Built with [Lovable](https://lovable.dev/) - AI-powered development platform
 
-For support, email support@itpln.ac.id or open an issue.
+## Support
+
+For technical support or questions:
+
+- Email: support@itpln.ac.id
+- Create an issue in the GitHub repository
 
 ---
 
-Made with ❤️ by ITPLN Team
+Institut Teknologi PLN - Energy Management Team
