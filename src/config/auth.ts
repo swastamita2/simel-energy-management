@@ -79,8 +79,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     permissions: [
       { module: 'dashboard', actions: ['view'] }, // View Dashboard
       { module: 'monitoring-laporan', actions: ['view'] }, // View Approved Reports
+      { module: 'settings', actions: ['view'] }, // View Settings
     ],
-    routes: ['/', '/monitoring-laporan'],
+    routes: ['/', '/monitoring-laporan', '/settings'],
   },
   // Manajer - View dashboard energi, grafik konsumsi, review reports, manage pola konsumsi, view log aktivitas
   manajer: {
@@ -91,8 +92,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
       { module: 'reports', actions: ['view'] }, // Review Reports
       { module: 'consumption', actions: ['view', 'edit'] }, // Manage Pola Konsumsi Energi
       { module: 'monitoring', actions: ['view'] }, // View Log Aktivitas Sistem
+      { module: 'settings', actions: ['view'] }, // View Settings
     ],
-    routes: ['/', '/monitoring', '/analytics', '/reports'],
+    routes: ['/', '/monitoring', '/analytics', '/reports', '/settings'],
   },
   // Teknisi - Maintenance hardware, menerima notifikasi anomali, menjalankan jadwal pemeriksaan perangkat
   teknisi: {
@@ -103,8 +105,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
       { module: 'devices', actions: ['view', 'control'] }, // ON/OFF/Reset perangkat
       { module: 'notifications', actions: ['view'] }, // Menerima Notifikasi Anomali
       { module: 'maintenance', actions: ['view', 'edit'] }, // Menjalankan Jadwal Pemeriksaan Perangkat
+      { module: 'settings', actions: ['view'] }, // View Settings
     ],
-    routes: ['/', '/monitoring'],
+    routes: ['/', '/monitoring', '/settings'],
   },
   // Dosen & Mahasiswa - View dashboard publik, view konsumsi energi ruangan
   mahasiswa: {
@@ -112,8 +115,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, RolePermissions> = {
     permissions: [
       { module: 'dashboard', actions: ['view'] }, // View Dashboard Publik
       { module: 'analytics', actions: ['view'] }, // View Konsumsi Energi Ruangan
+      { module: 'settings', actions: ['view'] }, // View Settings
     ],
-    routes: ['/', '/analytics'],
+    routes: ['/', '/analytics', '/settings'],
   },
 };
 
