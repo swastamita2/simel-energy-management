@@ -32,6 +32,7 @@ let rooms = [
   { id: 3, name: 'Lab Elektronika', building: 'Gedung B - Lt. 1', enabled: true, consumption: 8.5, temperature: 28, devicesOn: 24, totalDevices: 25, status: 'warning' },
   { id: 4, name: 'Auditorium', building: 'Gedung C', enabled: true, consumption: 12.4, temperature: 23, devicesOn: 32, totalDevices: 35, status: 'alert' },
 ];
+const failOnceTracker = new Map();
 
 const sendSuccess = (res, data, message) => {
   return res.json({
@@ -205,6 +206,33 @@ app.delete('/api/monitoring/rooms/:id', (req, res) => {
 
   rooms.splice(roomIndex, 1);
   return sendSuccess(res, null, 'Room deleted');
+});
+
+app.post('/api/monitoring/test/reset', (_req, res) => {
+  failOnceTracker.clear();
+  return sendSuccess(res, { reset: true }, 'Test state reset');
+});
+
+app.get('/api/monitoring/test/fail-once', (req, res) => {
+  const key = String(req.query.key || 'default');
+  const attempts = (failOnceTracker.get(key) || 0) + 1;
+  failOnceTracker.set(key, attempts);
+
+  if (attempts === 1) {
+    return sendError(res, 500, 'Simulated transient failure', { key, attempts });
+  }
+
+  return sendSuccess(res, { key, attempts }, 'Recovered after transient failure');
+});
+
+app.get('/api/monitoring/test/slow', async (req, res) => {
+  const requestedDelay = Number(req.query.delayMs || 1500);
+  const delayMs = Number.isFinite(requestedDelay)
+    ? Math.max(0, Math.min(requestedDelay, 15000))
+    : 1500;
+
+  await new Promise((resolve) => setTimeout(resolve, delayMs));
+  return sendSuccess(res, { delayMs }, 'Slow response done');
 });
 
 app.use('/api/*', (_req, res) => {
