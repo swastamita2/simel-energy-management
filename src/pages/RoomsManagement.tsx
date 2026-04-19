@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { Card } from "@/components/ui/card";
@@ -9,8 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Search, Plus, Edit, Trash2, Building2, Download, Upload } from "lucide-react";
-import { monitoringService, AdminRoom } from "@/services/monitoringService";
+import { Search, Plus, Edit, Trash2, Building2 } from "lucide-react";
+import { AdminRoom } from "@/services/monitoringService";
+import { useAdminRooms } from "@/hooks/use-admin-rooms";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -21,36 +22,13 @@ const defaultFormData = {
 };
 
 const RoomsManagement = () => {
-  const [rooms, setRooms] = useState<AdminRoom[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { rooms, isLoading, isSubmitting, createRoom, updateRoom, deleteRoom } = useAdminRooms();
   const [searchQuery, setSearchQuery] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<AdminRoom | null>(null);
   const [formData, setFormData] = useState(defaultFormData);
-
-  const fetchRooms = async () => {
-    try {
-      setIsLoading(true);
-      const response = await monitoringService.getRooms();
-      if (!response.success) {
-        toast.error(response.error || "Failed to load rooms");
-        return;
-      }
-      setRooms(response.data || []);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to load rooms";
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void fetchRooms();
-  }, []);
 
   const filteredRooms = useMemo(() => (
     rooms.filter((room) =>
@@ -65,29 +43,20 @@ const RoomsManagement = () => {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
-      const response = await monitoringService.createRoom({
-        name: formData.name.trim(),
-        building: formData.building.trim(),
-        enabled: formData.enabled,
-      });
+    const result = await createRoom({
+      name: formData.name.trim(),
+      building: formData.building.trim(),
+      enabled: formData.enabled,
+    });
 
-      if (!response.success) {
-        toast.error(response.error || "Failed to add room");
-        return;
-      }
-
-      await fetchRooms();
-      toast.success(`Room "${formData.name}" added successfully`);
-      setIsAddDialogOpen(false);
-      setFormData(defaultFormData);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to add room";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    if (!result.success) {
+      toast.error(result.error || "Failed to add room");
+      return;
     }
+
+    toast.success(`Room "${formData.name}" added successfully`);
+    setIsAddDialogOpen(false);
+    setFormData(defaultFormData);
   };
 
   const handleEditRoom = async () => {
@@ -96,30 +65,21 @@ const RoomsManagement = () => {
       return;
     }
 
-    try {
-      setIsSubmitting(true);
-      const response = await monitoringService.updateRoom(selectedRoom.id, {
-        name: formData.name.trim(),
-        building: formData.building.trim(),
-        enabled: formData.enabled,
-      });
+    const result = await updateRoom(selectedRoom.id, {
+      name: formData.name.trim(),
+      building: formData.building.trim(),
+      enabled: formData.enabled,
+    });
 
-      if (!response.success) {
-        toast.error(response.error || "Failed to update room");
-        return;
-      }
-
-      await fetchRooms();
-      toast.success(`Room "${formData.name}" updated successfully`);
-      setIsEditDialogOpen(false);
-      setSelectedRoom(null);
-      setFormData(defaultFormData);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to update room";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    if (!result.success) {
+      toast.error(result.error || "Failed to update room");
+      return;
     }
+
+    toast.success(`Room "${formData.name}" updated successfully`);
+    setIsEditDialogOpen(false);
+    setSelectedRoom(null);
+    setFormData(defaultFormData);
   };
 
   const handleDeleteRoom = async () => {
@@ -129,24 +89,17 @@ const RoomsManagement = () => {
       toast.warning(`Warning: ${selectedRoom.totalDevices} devices will be deleted with this room`);
     }
 
-    try {
-      setIsSubmitting(true);
-      const response = await monitoringService.deleteRoom(selectedRoom.id);
-      if (!response.success) {
-        toast.error(response.error || "Failed to delete room");
-        return;
-      }
+    const roomName = selectedRoom.name;
+    const result = await deleteRoom(selectedRoom.id);
 
-      await fetchRooms();
-      toast.success(`Room "${selectedRoom.name}" deleted successfully`);
-      setIsDeleteDialogOpen(false);
-      setSelectedRoom(null);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to delete room";
-      toast.error(message);
-    } finally {
-      setIsSubmitting(false);
+    if (!result.success) {
+      toast.error(result.error || "Failed to delete room");
+      return;
     }
+
+    toast.success(`Room "${roomName}" deleted successfully`);
+    setIsDeleteDialogOpen(false);
+    setSelectedRoom(null);
   };
 
   const openEditDialog = (room: AdminRoom) => {
@@ -162,70 +115,6 @@ const RoomsManagement = () => {
   const openDeleteDialog = (room: AdminRoom) => {
     setSelectedRoom(room);
     setIsDeleteDialogOpen(true);
-  };
-
-  const handleExport = () => {
-    const data = JSON.stringify(
-      {
-        exportedAt: new Date().toISOString(),
-        rooms,
-      },
-      null,
-      2,
-    );
-
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `energy-data-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Data exported successfully");
-  };
-
-  const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const jsonData = e.target?.result as string;
-        const parsed = JSON.parse(jsonData) as { rooms?: AdminRoom[] } | AdminRoom[];
-        const roomItems = Array.isArray(parsed) ? parsed : (parsed.rooms || []);
-
-        if (roomItems.length === 0) {
-          toast.error("No room data found in imported file");
-          return;
-        }
-
-        setIsSubmitting(true);
-        const results = await Promise.allSettled(
-          roomItems.map((room) =>
-            monitoringService.createRoom({
-              name: room.name,
-              building: room.building,
-              enabled: room.enabled ?? true,
-            }),
-          ),
-        );
-
-        const successCount = results.filter((result) => result.status === 'fulfilled').length;
-        if (successCount > 0) {
-          await fetchRooms();
-          toast.success(`${successCount} room(s) imported successfully`);
-        } else {
-          toast.error("No room was imported");
-        }
-      } catch (error) {
-        toast.error("Failed to import data. Please check the file format.");
-      } finally {
-        setIsSubmitting(false);
-      }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
   };
 
   const statusColors = {
@@ -250,22 +139,6 @@ const RoomsManagement = () => {
                 <p className="text-muted-foreground mt-1">Manage building rooms and spaces</p>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleExport}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
-                <Button variant="outline" size="sm" asChild>
-                  <label className="cursor-pointer">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import
-                    <input
-                      type="file"
-                      accept=".json"
-                      className="hidden"
-                      onChange={handleImport}
-                    />
-                  </label>
-                </Button>
                 <Button onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Room
