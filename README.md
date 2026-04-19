@@ -144,17 +144,31 @@ Follow these steps to set up the development environment:
    Edit `.env.local` with your configuration:
 
    ```env
-   VITE_API_BASE_URL=http://localhost:3000/api
-   VITE_ENABLE_MOCK_DATA=true
+   VITE_API_BASE_URL=/api
+   VITE_API_PROXY_TARGET=http://localhost:3000
+   VITE_ENABLE_MOCK_DATA=false
    ```
 
-4. **Start the development server**
+4. **Start backend API (for real API mode)**
+
+   ```bash
+   cd backend
+   cp .env.example .env
+   npm install
+   npm run dev
+   ```
+
+   Default test credentials:
+   - Email: `admin@itpln.ac.id`
+   - Password: `admin123`
+
+5. **Start the frontend development server**
 
    ```bash
    npm run dev
    ```
 
-5. **Access the application**
+6. **Access the application**
 
    Open your browser and navigate to `http://localhost:8080`
 
@@ -162,6 +176,7 @@ Follow these steps to set up the development environment:
 
 ```
 web-simul/
+├── backend/              # Local API server (Express + JWT)
 ├── .github/              # GitHub workflows (CI/CD)
 ├── public/               # Static assets
 ├── src/
@@ -232,12 +247,13 @@ npm run test:coverage    # Generate coverage report
 
 ### Environment Variables
 
-| Variable                | Description                | Default                     |
-| ----------------------- | -------------------------- | --------------------------- |
-| `VITE_API_BASE_URL`     | Backend API URL            | `http://localhost:3000/api` |
-| `VITE_ENABLE_MOCK_DATA` | Use mock data              | `true`                      |
-| `VITE_ENABLE_DEV_TOOLS` | Enable dev tools           | `true`                      |
-| `VITE_REFRESH_INTERVAL` | Data refresh interval (ms) | `5000`                      |
+| Variable                | Description                | Default                 |
+| ----------------------- | -------------------------- | ----------------------- |
+| `VITE_API_BASE_URL`     | Frontend API path          | `/api`                  |
+| `VITE_API_PROXY_TARGET` | Backend proxy target       | `http://localhost:3000` |
+| `VITE_ENABLE_MOCK_DATA` | Use mock data              | `true`                  |
+| `VITE_ENABLE_DEV_TOOLS` | Enable dev tools           | `true`                  |
+| `VITE_REFRESH_INTERVAL` | Data refresh interval (ms) | `5000`                  |
 
 ### Administration System Usage
 

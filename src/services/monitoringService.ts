@@ -184,7 +184,7 @@ export const monitoringService = {
       });
     }
 
-    return api.patch<ApiResponse<AdminRoom>>(`/monitoring/rooms/${id}`, payload);
+    return api.put<ApiResponse<AdminRoom>>(`/monitoring/rooms/${id}`, payload);
   },
 
   // Delete room
