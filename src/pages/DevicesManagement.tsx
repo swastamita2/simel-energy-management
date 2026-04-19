@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Plus, Edit, Trash2, Zap } from "lucide-react";
 import { AdminDevice, CreateDevicePayload } from "@/services/monitoringService";
 import { useAdminDevices } from "@/hooks/use-admin-devices";
+import { useAdminRooms } from "@/hooks/use-admin-rooms";
 import { toast } from "sonner";
 
 const deviceTypes: CreateDevicePayload['type'][] = ['ac', 'light', 'projector', 'computer', 'other'];
@@ -28,6 +29,7 @@ const deviceTypeLabel: Record<CreateDevicePayload['type'], string> = {
 const defaultFormData = {
   name: '',
   type: 'light' as CreateDevicePayload['type'],
+  roomId: '',
   room: '',
   building: '',
   maxPower: '',
@@ -36,6 +38,7 @@ const defaultFormData = {
 
 const DevicesManagement = () => {
   const { devices, isLoading, isSubmitting, createDevice, updateDevice, deleteDevice } = useAdminDevices();
+  const { rooms: availableRooms, isLoading: isRoomsLoading } = useAdminRooms();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRoom, setFilterRoom] = useState('all');
   const [filterType, setFilterType] = useState('all');
@@ -64,6 +67,18 @@ const DevicesManagement = () => {
         return matchesSearch && matchesRoom && matchesType;
       }),
     [devices, filterRoom, filterType, searchQuery],
+  );
+
+  const roomSelectOptions = useMemo(
+    () =>
+      availableRooms
+        .map((room) => ({
+          id: String(room.id),
+          name: room.name,
+          building: room.building,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [availableRooms],
   );
 
   const resetForm = () => {
@@ -151,10 +166,15 @@ const DevicesManagement = () => {
   };
 
   const openEditDialog = (device: AdminDevice) => {
+    const matchedRoom = roomSelectOptions.find(
+      (room) => room.name === device.room && room.building === device.building,
+    );
+
     setSelectedDevice(device);
     setFormData({
       name: device.name,
       type: device.type,
+      roomId: matchedRoom?.id || '',
       room: device.room,
       building: device.building,
       maxPower: String(device.maxPower),
@@ -395,20 +415,45 @@ const DevicesManagement = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="device-room">Room *</Label>
-              <Input
-                id="device-room"
-                placeholder="e.g., Lab Komputer 1"
-                value={formData.room}
-                onChange={(event) => setFormData({ ...formData, room: event.target.value })}
-              />
+              <Select
+                value={formData.roomId}
+                onValueChange={(value) => {
+                  const selectedRoom = roomSelectOptions.find((room) => room.id === value);
+                  setFormData({
+                    ...formData,
+                    roomId: value,
+                    room: selectedRoom?.name || '',
+                    building: selectedRoom?.building || '',
+                  });
+                }}
+              >
+                <SelectTrigger id="device-room" disabled={isRoomsLoading || roomSelectOptions.length === 0}>
+                  <SelectValue
+                    placeholder={
+                      isRoomsLoading
+                        ? 'Loading rooms...'
+                        : roomSelectOptions.length === 0
+                          ? 'No room available'
+                          : 'Select room'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {roomSelectOptions.map((room) => (
+                    <SelectItem key={room.id} value={room.id}>
+                      {room.name} ({room.building})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="device-building">Building *</Label>
               <Input
                 id="device-building"
-                placeholder="e.g., Gedung A - Lt. 2"
+                placeholder="Building is set from selected room"
                 value={formData.building}
-                onChange={(event) => setFormData({ ...formData, building: event.target.value })}
+                readOnly
               />
             </div>
             <div className="space-y-2">

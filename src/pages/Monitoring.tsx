@@ -17,19 +17,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEnergy } from "@/contexts/EnergyContext";
+import { useMonitoringDashboard } from "@/hooks/use-monitoring-dashboard";
 
 const Monitoring = () => {
   const {
     devices,
     rooms,
     stats,
-    updateDeviceStatus,
     updateDevicePower,
     toggleRoom,
+    toggleDevice,
     refreshData,
-    isRefreshing
-  } = useEnergy();
+    isRefreshing,
+    isLoading,
+  } = useMonitoringDashboard();
 
   const [roomSearchQuery, setRoomSearchQuery] = useState("");
   const [deviceSearchQuery, setDeviceSearchQuery] = useState("");
@@ -37,26 +38,39 @@ const Monitoring = () => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Handle room master control
-  const handleRoomToggle = (roomId: number, enabled: boolean) => {
-    toggleRoom(roomId);
+  const handleRoomToggle = async (roomId: number, enabled: boolean) => {
+    const result = await toggleRoom(roomId, enabled);
+    if (!result.success) {
+      toast.error(result.error || 'Failed to update room');
+      return;
+    }
+
     const room = rooms.find(r => r.id === roomId);
-    toast.success(`${room?.name} ${enabled ? 'disabled' : 'enabled'}`, {
-      description: enabled ? 'All devices turned off' : 'All devices turned on'
+    toast.success(`${room?.name} ${enabled ? 'enabled' : 'disabled'}`, {
+      description: enabled ? 'All room devices turned on' : 'All room devices turned off'
     });
   };
 
   // Handle device toggle
-  const handleDeviceToggle = (deviceId: number, enabled: boolean) => {
+  const handleDeviceToggle = async (deviceId: number, enabled: boolean) => {
     const device = devices.find(d => d.id === deviceId);
     if (device?.status !== "offline") {
-      updateDeviceStatus(deviceId, enabled ? "on" : "off");
+      const result = await toggleDevice(deviceId, enabled);
+      if (!result.success) {
+        toast.error(result.error || 'Failed to update device');
+        return;
+      }
+
       toast.success(`${device?.name} turned ${enabled ? 'on' : 'off'}`);
     }
   };
 
   // Handle device power change
-  const handleDevicePowerChange = (deviceId: number, power: number) => {
-    updateDevicePower(deviceId, power);
+  const handleDevicePowerChange = async (deviceId: number, power: number) => {
+    const result = await updateDevicePower(deviceId, power);
+    if (!result.success && result.error) {
+      toast.error(result.error);
+    }
   };
 
   // Handle export
@@ -210,7 +224,11 @@ const Monitoring = () => {
                 )}
               </div>
 
-              {filteredRooms.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Loading monitoring rooms...</p>
+                </div>
+              ) : filteredRooms.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">No rooms found matching your filters</p>
                   <Button
@@ -264,7 +282,11 @@ const Monitoring = () => {
                 )}
               </div>
 
-              {filteredDevices.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">Loading monitoring devices...</p>
+                </div>
+              ) : filteredDevices.length === 0 ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">No devices found matching "{deviceSearchQuery}"</p>
                   <Button

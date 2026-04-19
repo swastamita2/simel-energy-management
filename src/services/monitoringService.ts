@@ -38,6 +38,7 @@ export interface UpdateDevicePayload {
   building?: string;
   maxPower?: number;
   status?: DeviceStatus;
+  power?: number;
   temperature?: number;
 }
 
@@ -306,6 +307,11 @@ export const monitoringService = {
           const currentDevice = mockDevices[deviceIndex];
           const nextMaxPower = payload.maxPower ?? currentDevice.maxPower;
           const nextStatus = payload.status ?? currentDevice.status;
+          const nextPowerFromPayload = payload.power;
+          const boundedPower =
+            typeof nextPowerFromPayload === 'number'
+              ? Math.max(0, Math.min(nextPowerFromPayload, nextMaxPower))
+              : undefined;
 
           const updatedDevice: AdminDevice = {
             ...currentDevice,
@@ -314,7 +320,7 @@ export const monitoringService = {
             status: nextStatus,
             power:
               nextStatus === 'on'
-                ? Math.min(currentDevice.power || Math.round(nextMaxPower * 0.8), nextMaxPower)
+                ? (boundedPower ?? Math.min(currentDevice.power || Math.round(nextMaxPower * 0.8), nextMaxPower))
                 : 0,
           };
 
