@@ -1,14 +1,30 @@
 import { api } from './api';
 import { ApiResponse, Room, Device, MonitoringOverview } from '@/types';
 
+export interface AdminRoom extends Room {
+  enabled?: boolean;
+}
+
+export interface CreateRoomPayload {
+  name: string;
+  building: string;
+  enabled?: boolean;
+}
+
+export interface UpdateRoomPayload {
+  name?: string;
+  building?: string;
+  enabled?: boolean;
+}
+
 // Mock data
-const mockRooms: Room[] = [
-  { id: 1, name: "Lab Komputer 1", building: "Gedung A - Lt. 2", consumption: 4.2, temperature: 24, devicesOn: 18, totalDevices: 20, status: "normal" },
-  { id: 2, name: "Ruang Kuliah 201", building: "Gedung A - Lt. 2", consumption: 3.8, temperature: 26, devicesOn: 12, totalDevices: 15, status: "normal" },
-  { id: 3, name: "Lab Elektronika", building: "Gedung B - Lt. 1", consumption: 8.5, temperature: 28, devicesOn: 24, totalDevices: 25, status: "warning" },
-  { id: 4, name: "Auditorium", building: "Gedung C", consumption: 12.4, temperature: 23, devicesOn: 32, totalDevices: 35, status: "alert" },
-  { id: 5, name: "Perpustakaan", building: "Gedung D - Lt. 1", consumption: 5.6, temperature: 25, devicesOn: 28, totalDevices: 30, status: "normal" },
-  { id: 6, name: "Kantor Dosen", building: "Gedung A - Lt. 3", consumption: 2.1, temperature: 26, devicesOn: 8, totalDevices: 12, status: "normal" },
+const mockRooms: AdminRoom[] = [
+  { id: 1, name: "Lab Komputer 1", building: "Gedung A - Lt. 2", consumption: 4.2, temperature: 24, devicesOn: 18, totalDevices: 20, status: "normal", enabled: true },
+  { id: 2, name: "Ruang Kuliah 201", building: "Gedung A - Lt. 2", consumption: 3.8, temperature: 26, devicesOn: 12, totalDevices: 15, status: "normal", enabled: true },
+  { id: 3, name: "Lab Elektronika", building: "Gedung B - Lt. 1", consumption: 8.5, temperature: 28, devicesOn: 24, totalDevices: 25, status: "warning", enabled: true },
+  { id: 4, name: "Auditorium", building: "Gedung C", consumption: 12.4, temperature: 23, devicesOn: 32, totalDevices: 35, status: "alert", enabled: true },
+  { id: 5, name: "Perpustakaan", building: "Gedung D - Lt. 1", consumption: 5.6, temperature: 25, devicesOn: 28, totalDevices: 30, status: "normal", enabled: true },
+  { id: 6, name: "Kantor Dosen", building: "Gedung A - Lt. 3", consumption: 2.1, temperature: 26, devicesOn: 8, totalDevices: 12, status: "normal", enabled: true },
 ];
 
 const mockDevices: Device[] = [
@@ -22,7 +38,7 @@ const mockDevices: Device[] = [
 
 export const monitoringService = {
   // Get all rooms
-  getRooms: async (): Promise<ApiResponse<Room[]>> => {
+  getRooms: async (): Promise<ApiResponse<AdminRoom[]>> => {
     if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -33,11 +49,11 @@ export const monitoringService = {
         }, 500);
       });
     }
-    return api.get<ApiResponse<Room[]>>('/monitoring/rooms');
+    return api.get<ApiResponse<AdminRoom[]>>('/monitoring/rooms');
   },
 
   // Get room by ID
-  getRoomById: async (id: number): Promise<ApiResponse<Room>> => {
+  getRoomById: async (id: number): Promise<ApiResponse<AdminRoom>> => {
     if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
       return new Promise((resolve) => {
         const room = mockRooms.find(r => r.id === id);
@@ -49,7 +65,106 @@ export const monitoringService = {
         }, 300);
       });
     }
-    return api.get<ApiResponse<Room>>(`/monitoring/rooms/${id}`);
+    return api.get<ApiResponse<AdminRoom>>(`/monitoring/rooms/${id}`);
+  },
+
+  // Create room
+  createRoom: async (payload: CreateRoomPayload): Promise<ApiResponse<AdminRoom>> => {
+    if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const newId = mockRooms.length > 0 ? Math.max(...mockRooms.map((r) => r.id)) + 1 : 1;
+          const newRoom: AdminRoom = {
+            id: newId,
+            name: payload.name,
+            building: payload.building,
+            enabled: payload.enabled ?? true,
+            consumption: 0,
+            temperature: 24,
+            devicesOn: 0,
+            totalDevices: 0,
+            status: 'normal',
+          };
+          mockRooms.push(newRoom);
+
+          resolve({
+            success: true,
+            data: newRoom,
+          });
+        }, 300);
+      });
+    }
+
+    return api.post<ApiResponse<AdminRoom>>('/monitoring/rooms', payload);
+  },
+
+  // Update room
+  updateRoom: async (id: number, payload: UpdateRoomPayload): Promise<ApiResponse<AdminRoom>> => {
+    if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const roomIndex = mockRooms.findIndex((r) => r.id === id);
+          if (roomIndex === -1) {
+            resolve({
+              success: false,
+              data: {} as AdminRoom,
+              error: 'Room not found',
+            });
+            return;
+          }
+
+          const existingRoom = mockRooms[roomIndex];
+          const updatedRoom: AdminRoom = {
+            ...existingRoom,
+            ...payload,
+          };
+          mockRooms[roomIndex] = updatedRoom;
+
+          resolve({
+            success: true,
+            data: updatedRoom,
+          });
+        }, 300);
+      });
+    }
+
+    return api.patch<ApiResponse<AdminRoom>>(`/monitoring/rooms/${id}`, payload);
+  },
+
+  // Delete room
+  deleteRoom: async (id: number): Promise<ApiResponse<null>> => {
+    if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const roomIndex = mockRooms.findIndex((r) => r.id === id);
+          if (roomIndex === -1) {
+            resolve({
+              success: false,
+              data: null,
+              error: 'Room not found',
+            });
+            return;
+          }
+
+          const room = mockRooms[roomIndex];
+          mockRooms.splice(roomIndex, 1);
+
+          // Keep mock data consistent by removing devices that belong to deleted room.
+          for (let i = mockDevices.length - 1; i >= 0; i--) {
+            if (mockDevices[i].room === room.name) {
+              mockDevices.splice(i, 1);
+            }
+          }
+
+          resolve({
+            success: true,
+            data: null,
+          });
+        }, 300);
+      });
+    }
+
+    return api.delete<ApiResponse<null>>(`/monitoring/rooms/${id}`);
   },
 
   // Get all devices
@@ -101,19 +216,19 @@ export const monitoringService = {
   },
 
   // Toggle room (all devices in room)
-  toggleRoom: async (roomId: number, enabled: boolean): Promise<ApiResponse<Room>> => {
+  toggleRoom: async (roomId: number, enabled: boolean): Promise<ApiResponse<AdminRoom>> => {
     if (import.meta.env.VITE_ENABLE_MOCK_DATA === 'true') {
       return new Promise((resolve) => {
         setTimeout(() => {
           const room = mockRooms.find(r => r.id === roomId);
           resolve({
             success: true,
-            data: room!,
+            data: room ? { ...room, enabled } : ({} as AdminRoom),
           });
         }, 300);
       });
     }
-    return api.patch<ApiResponse<Room>>(`/monitoring/rooms/${roomId}`, { enabled });
+    return api.patch<ApiResponse<AdminRoom>>(`/monitoring/rooms/${roomId}`, { enabled });
   },
 
   // Get monitoring overview
