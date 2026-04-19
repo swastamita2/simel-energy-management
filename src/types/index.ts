@@ -1,6 +1,6 @@
 // Common Types
 export type Status = 'normal' | 'warning' | 'alert' | 'offline';
-export type DeviceType = 'light' | 'ac' | 'projector' | 'other';
+export type DeviceType = 'light' | 'ac' | 'projector' | 'computer' | 'other';
 export type DeviceStatus = 'on' | 'off' | 'offline';
 
 // Energy Data Types
@@ -36,6 +36,7 @@ export interface Room {
   id: number;
   name: string;
   building: string;
+  enabled: boolean;
   consumption: number;
   temperature: number;
   devicesOn: number;
@@ -49,8 +50,11 @@ export interface Device {
   name: string;
   type: DeviceType;
   room: string;
+  building?: string;
   status: DeviceStatus;
   power: number;
+  maxPower?: number;
+  temperature?: number;
   lastUpdate?: string;
 }
 

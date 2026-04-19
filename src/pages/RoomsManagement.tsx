@@ -107,7 +107,7 @@ const RoomsManagement = () => {
     setFormData({
       name: room.name,
       building: room.building,
-      enabled: room.enabled ?? true,
+      enabled: room.enabled,
     });
     setIsEditDialogOpen(true);
   };
@@ -166,7 +166,7 @@ const RoomsManagement = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Active</p>
-                    <p className="text-2xl font-bold">{rooms.filter((r) => r.enabled !== false).length}</p>
+                    <p className="text-2xl font-bold">{rooms.filter((r) => r.enabled).length}</p>
                   </div>
                 </div>
               </Card>
@@ -256,8 +256,8 @@ const RoomsManagement = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={room.enabled !== false ? "default" : "secondary"}>
-                            {room.enabled !== false ? "Active" : "Disabled"}
+                          <Badge variant={room.enabled ? "default" : "secondary"}>
+                            {room.enabled ? "Active" : "Disabled"}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
