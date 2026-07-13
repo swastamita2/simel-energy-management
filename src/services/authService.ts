@@ -2,9 +2,27 @@ import { api } from './api';
 import { ApiResponse, LoginCredentials, LoginResponse, User } from '@/types';
 import { MOCK_USERS, MOCK_PASSWORDS } from '@/config/auth';
 
+const saveSession = (response: LoginResponse) => {
+  if (response.data?.accessToken) {
+    localStorage.setItem('accessToken', response.data.accessToken);
+  }
+  if (response.data?.refreshToken) {
+    localStorage.setItem('refreshToken', response.data.refreshToken);
+  }
+  if (response.user) {
+    localStorage.setItem('user', JSON.stringify(response.user));
+  }
+};
+
 export const authService = {
   // Login
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
+    if (import.meta.env.VITE_ENABLE_MOCK_DATA !== 'true') {
+      const response = await api.post<LoginResponse>('/auth/login', credentials);
+      saveSession(response);
+      return response;
+    }
+
     // Mock authentication (tanpa database)
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -55,9 +73,7 @@ export const authService = {
               user: mahasiswaUser,
             };
 
-            // Store token and user in localStorage
-            localStorage.setItem('accessToken', mockToken);
-            localStorage.setItem('user', JSON.stringify(mahasiswaUser));
+            saveSession(response);
 
             resolve(response);
             return;
@@ -97,9 +113,7 @@ export const authService = {
           user: user,
         };
 
-        // Store token and user in localStorage
-        localStorage.setItem('accessToken', mockToken);
-        localStorage.setItem('user', JSON.stringify(user));
+        saveSession(response);
 
         resolve(response);
       }, 800); // Simulate network delay

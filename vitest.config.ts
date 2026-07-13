@@ -1,26 +1,22 @@
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()] as any,
   test: {
-    globals: true,
+    // Gunakan jsdom agar localStorage, window, dan DOM API tersedia
     environment: 'jsdom',
+    // File setup global sebelum setiap test suite berjalan
     setupFiles: ['./src/test/setup.ts'],
-    css: true,
+    // Pola file yang dikenali sebagai default test run (Unit & Component)
+    include: ['src/tests/unit/**/*.test.ts', 'src/**/*.test.tsx', 'src/lib/**/*.test.ts'],
+    // Hapus exclude untuk integration test, agar bisa dijalankan secara eksplisit via argumen CLI
+    exclude: ['node_modules/**'],
+    globals: true,
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/mockData',
-        '**/*.spec.*',
-        '**/*.test.*',
-      ],
+      reporter: ['text', 'html', 'lcov'],
+      include: ['src/services/**/*.ts', 'src/lib/**/*.ts'],
+      exclude: ['src/**/*.test.ts', 'src/**/*.integration.test.ts', 'src/test/**'],
     },
   },
   resolve: {

@@ -8,10 +8,11 @@ import * as Icons from "lucide-react";
 
 interface DeviceControlProps {
   name: string;
-  type: "light" | "ac" | "projector" | "other";
+  type: "light" | "ac" | "projector" | "computer" | "other";
   room: string;
   status: "on" | "off" | "offline";
   power: number;
+  maxPower?: number;
   onToggle?: (enabled: boolean) => void;
   onPowerChange?: (value: number) => void;
 }
@@ -22,6 +23,7 @@ export const DeviceControl = ({
   room,
   status,
   power,
+  maxPower,
   onToggle,
   onPowerChange
 }: DeviceControlProps) => {
@@ -38,6 +40,7 @@ export const DeviceControl = ({
       case 'light': return Icons.Lightbulb;
       case 'ac': return Icons.Fan;
       case 'projector': return Icons.MonitorPlay;
+      case 'computer': return Icons.Monitor;
       case 'other': return Icons.Zap;
       default: return Icons.Zap;
     }
@@ -64,10 +67,15 @@ export const DeviceControl = ({
   };
 
   const getMaxPower = () => {
+    if (typeof maxPower === 'number' && maxPower > 0) {
+      return maxPower;
+    }
+
     switch (type) {
       case 'ac': return 1500;
       case 'projector': return 500;
       case 'light': return 300;
+      case 'computer': return 1000;
       default: return 1000;
     }
   };
