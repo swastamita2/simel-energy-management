@@ -209,6 +209,12 @@ app.post('/api/auth/login', (req, res) => {
     accessToken,
     refreshToken,
     expiresIn: 3600,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    }
   }, 'Login success');
 });
 
@@ -234,6 +240,15 @@ app.post('/api/monitoring/rooms', (req, res) => {
 
   if (!name || !building) {
     return sendError(res, 400, 'name and building are required');
+  }
+
+  if (typeof name !== 'string' || typeof building !== 'string') {
+    return sendError(res, 400, 'name and building must be strings');
+  }
+
+  const existingRoom = findRoomByNameAndBuilding(name.trim(), building.trim());
+  if (existingRoom) {
+    return sendError(res, 409, 'Room with same name and building already exists');
   }
 
   const nextId = rooms.length > 0 ? Math.max(...rooms.map((item) => item.id)) + 1 : 1;
@@ -528,7 +543,8 @@ app.post('/api/monitoring/test/reset', (_req, res) => {
 });
 
 app.get('/api/monitoring/test/fail-once', (req, res) => {
-  const key = String(req.query.key || 'default');
+  const rawKey = String(req.query.key || 'default');
+  const key = rawKey.split('#')[0]; // Hapus hash-fragment jika terbawa oleh Axios
   const attempts = (failOnceTracker.get(key) || 0) + 1;
   failOnceTracker.set(key, attempts);
 

@@ -363,35 +363,46 @@ chore: update build process or dependencies
 
 ## Testing
 
-### Running Tests
+This project implements a rigorous testing strategy covering both isolated logic and API interactions.
 
-Execute the test suite using the following commands:
+### Testing Directory Structure
+
+All test suites are centralized in the `src/tests/` directory to maintain clean architecture and facilitate academic evaluation:
+
+- **`src/tests/unit/`**: Contains White-Box Unit Tests for service layers (e.g., `authService.test.ts`, `monitoringService.test.ts`). These tests run in complete isolation using mock data and do not require a backend.
+- **`src/tests/integration/`**: Contains Top-Down Integration Tests (e.g., `api.integration.test.ts`). These tests verify the real communication between the Frontend ApiClient and the Express Backend Server.
+
+### Running Unit Tests (Offline)
+
+Unit tests run entirely offline using simulated environments (`jsdom`) and mock data.
 
 ```bash
-# Run all tests in watch mode
-npm run test
+# Run all unit tests once (for CI/CD or Verification)
+npm run test:run
 
-# Run tests with interactive UI
+# Run tests with an interactive visual dashboard in the browser
 npm run test:ui
 
-# Generate code coverage report
+# Generate a code coverage report (Statements, Branches, Functions, Lines)
 npm run test:coverage
 ```
 
-### Writing Tests
+### Running Integration Tests (Requires Backend)
 
-Follow this structure for writing new tests:
+Integration tests require the local backend server to be running, as they execute real HTTP requests to verify the API contracts, authentication flows, and CRUD operations.
 
-```typescript
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+**Step 1: Start the Backend Server**
+```bash
+cd backend
+npm install
+npm run dev
+# Ensure the server is listening on http://localhost:3000
+```
 
-describe('MyComponent', () => {
-  it('renders correctly', () => {
-    render(<MyComponent />);
-    expect(screen.getByText('Hello')).toBeInTheDocument();
-  });
-});
+**Step 2: Run the Integration Test Suite**
+Open a new terminal in the project root and execute the dedicated integration configuration:
+```bash
+npx vitest run --config vitest.integration.config.ts
 ```
 
 ## Deployment
